@@ -1,0 +1,5 @@
+---
+title: "The Art of Readiable R code"
+author: "Angel Feliz"
+editor: source
+---

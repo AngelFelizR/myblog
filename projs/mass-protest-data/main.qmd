@@ -1,0 +1,1134 @@
+---
+title: "Characteristics of Successful Protests"
+author: "Angel Feliz"
+date: "17 November 2022"
+execute:
+  echo: true
+  message: false
+  warning: false
+format: 
+  html:
+    fig-width: 12
+    fig-height: 8
+    fig-align: "center"
+    toc: true
+    toc-title: Index
+    toc-location: left
+    self-contained: true
+    number-sections: true
+    smooth-scroll: true
+image: "Protesting-Sign.jpg"
+categories: [Data Cleaning, Text Mining]
+---
+
+<style>
+code{color: #0c5bd1;}
+</style>
+
+# Motiviation to create the proyect {.unnumbered .unlisted}
+
+As data scientist aspirant I was trying to find an interesting dataset which I can use to practice and share what I have learnt so far, when I found out that Datacamp has a [Github repository](https://github.com/datacamp/careerhub-data) with many uncleaned datasets to that I could use.
+
+I saw the folder [Mass Protest Data](https://github.com/datacamp/careerhub-data/tree/master/Mass%20Protest%20Data) very interesting as it describes protests from 1990 to 2020 worldwide. I understand that protests are important to the society and it would be interesting to check what can we learn from this dataset.
+
+# Introduction {.unnumbered}
+
+The goal of the blog is to define what characteristics share successful protests worldwide and the first step to achieve that it is to define what do I mean with **successful**. As most the protests demand state actions _I consider that a **protest is successful** when there is a reconciliation between the two parts_.
+
+To make that possible we will apply the next skills during the process:
+
+- **Functional programming** with *R*
+- **Data manipulation** with *data.table*, *lubridate* and *stringr*
+- **Text mining** with *tidytext*
+- **Data visualization** with *ggplot2*, *scales* and *forcats*
+- **Network visualization** with *igraph* and *ggraph*
+- **Automated reporting** with *quarto*, *flextable*, *html* and *css*
+
+
+# Enveroment set-up
+
+Before starting to find insights from data it's needed to load in R the functions and the data that we will use during the process.
+
+## Libraries importantion
+
+This first step of the process is to install and load all the libraries to avoid writing the function with the sintax `PackageName::FunctionName()` if we are going to use many functions of a library.
+
+```{r libraries-importation}
+if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+renv::restore()
+          
+library(data.table)
+library(lubridate)
+library(stringr)
+
+library(flextable)
+
+library(ggplot2)
+library(scales)
+library(forcats)
+library(igraph)
+library(ggraph)
+
+library(tidytext)
+
+glimpse <- pillar::glimpse
+codelist_panel <- countrycode::codelist_panel
+
+```
+
+
+## Custom functions
+
+Open-source package are very powerful as they provide general purpose functions, but it's also useful to have some custom functions to perform repetitive task and improve code readability. During this project, we will use the following functions group it purpose:
+
+### Styling
+
+- **custom_theme:** Defines the style of all ggplots across the project.
+
+```{r}
+CustomTheme <-
+theme_light()+
+  theme(axis.text = element_text(size = 15),
+        axis.title = element_text(size = 16, face = "bold"),
+        strip.text = element_text(size = 16, face = "bold"),
+        plot.title = element_text(size = 25, face = "bold", 
+                                  hjust = 0.5, margin = margin(b = 15)),
+        
+        legend.title = element_text(size = 15, face = "bold"),
+        legend.text = element_text(size = 14))
+
+theme_set(CustomTheme)
+rm(CustomTheme)
+```
+
+
+- **style_table:** Takes a `data.frame` and renders it as html table with a custom style.
+
+```{r define-style-function}
+
+style_table <- function(DF){
+  
+  flextable(DF) |>
+  theme_vanilla() |>
+  autofit()
+  
+}
+
+```
+
+
+### Data cleaning
+
+- **lower_clean_name:** Lower the case all words in a vector and remove any character that isn't a word.
+
+```{r}
+lower_clean_name <- function(text){
+  
+  str_to_lower(text) |>
+    str_replace_all("[^A-Za-z ']"," ") |> 
+    str_squish()
+}
+```
+
+- **clean_amount:** Transforms a character vector with number and commas into a double one.
+
+```{r}
+
+clean_amount <- \(x) gsub(",","",x) |> as.double()
+
+```
+
+### Data transformation
+
+- **find_string_approximation:** This function merges two data.tables to generate all possible combinations between them and select for each id the match that minimize the string distance between words of both tables. This function was inspired by the `reclin2` package as both follow simular steps.
+
+```{r}
+
+find_string_approximation <- function(DT1,
+                                      DT2,
+                                      id.var,
+                                      merge.by,
+                                      match.vars,
+                                      min.tolerance = 0.7,
+                                      stringdist.method = "lcs"){
+  
+  merge(DT1, DT2, by = merge.by, allow.cartesian = TRUE
+  )[, weight := 1 - stringdist::stringdist(get(match.vars[1]),get(match.vars[2]), 
+                                           method = stringdist.method) /
+                    (nchar(get(match.vars[1]))+nchar(get(match.vars[2])))
+  ][weight >= min.tolerance
+  ][order(-weight),
+    unique(.SD, by = id.var)]
+  
+}
+
+```
+
+
+### Plotting
+
+
+- **plot_word_found_distribution:** Creates a plot to show how the found words are distributed acording the number of words that have the `word.count.var`.
+
+```{r}
+
+plot_word_found_distribution <- function(DT,
+                                         word.count.var,
+                                         prostest.id.found,
+                                         success.label,
+                                         no.found.label,
+                                         label.colors,
+                                         title = "Number of words distribution",
+                                         subtitle = "",
+                                         x.lab = "Number of words", 
+                                         y.lab = ""){
+  
+  DT[!is.na(get(word.count.var)),
+     .(id,
+       word_count =  str_count(get(word.count.var)," ")+1,
+       success = fifelse(id %in% prostest.id.found,
+                         success.label,
+                         no.found.label) |> 
+                 factor(levels = names(label.colors)[c(2,1)] ))] |>
+    ggplot(aes(x = word_count,y = success, color = success))+
+    geom_jitter(alpha = 0.20, size = 2, height = 0.40, width = 0.15)+
+    scale_x_continuous(breaks = breaks_width(1,1))+
+    scale_color_manual(values = label.colors)+
+    labs(title = title, subtitle = subtitle, x = x.lab, y = y.lab)+
+    theme(plot.subtitle = element_text(size = 18, margin = margin(b = 15)),
+          panel.grid.major.y = element_blank(),
+          legend.position = "none")
+  
+}
+
+```
+
+
+## Data importation
+
+In this section we will take the data available and load it into R as `data.table` objects.
+
+### Main data
+
+**ProtestRaw** will be the main reference to use during the analysis. Any other imported data during this project will be used to extend or clean the information given in this data.
+
+```{r data-importation}
+
+ProtestRaw <-
+  fread("Raw-data/protest_data.csv", na.strings = "", integer64 = "double")
+
+glimpse(ProtestRaw)
+
+```
+
+### Complementary data
+
+Let's import complementary data to make sense, clean and expand the information provided in `ProtestRaw`.
+
+- **WorldCities:** It has information about 239 countries and their cities. It will be used to clean the `location` field in the main data.
+
+```{r scrap-country-cities}
+
+WorldCities <-
+  fread("Raw-data/worldcities.csv", na.strings = "", sep=",",
+        select = c("country","city_ascii","capital","population")
+  )[order(country,-population)
+    
+  # Applying some manual modifications to assure that ProtestRaw and WorlCites
+  # use the same name for the same country
+  ][,`:=`(country = fcase(country == "Hong Kong","China",
+                          country == "The Gambia","Gambia",
+                          country == "United Arab Emirates","United Arab Emirate",
+                          country == "Cabo Verde", "Cape Verde",
+                          country == "Bosnia And Herzegovina","Bosnia",
+                          country == "Slovakia", "Slovak Republic",
+                          country == "Czechia","Czech Republic",
+                          rep(TRUE,.N), country) |>
+                   lower_clean_name(),
+          city_ascii = lower_clean_name(city_ascii))
+   
+  # Identifying the capital of each country in each raw
+  ][!capital %like% "\\w", 
+    capital := NA_character_
+  ][country == "taiwan" & city_ascii == "taipei", 
+    capital := "primary"]
+
+glimpse(WorldCities)
+
+```
+
+- **CountryCode:** It has information of country codes from many institutions and we will use it to find out the `ccode` origin.
+
+```{r country-codes}
+
+CountryCode <-
+  codelist_panel |>
+  as.data.table() |>
+  (\(DT) DT[year >= min(ProtestRaw$year), 
+            .SD, 
+            .SDcols= c("country.name.en",
+                       "country.name.en.regex",
+                       names(DT)[sapply(DT, is.double)])
+         
+          # Germany, West correction from Raw-data/p5manualv2018.pdf
+         ][country.name.en == "Germany" & year == 1990,
+           c("p4n","p5n") := 260] )()
+
+glimpse(CountryCode)
+
+```
+
+- **Polity5:** Has some indicators to describe how state structures have been changing overtime.
+
+  1. **DEMOC**: Goes from 0 to 10 to measure ***democracy*** level in a country in a specific time.
+  2. **AUTOC**: Goes from 0 to 10 to measure ***autocracy*** level in a country in a specific time.
+  3. **POLITY**: Results from the operation of subtracting AUTOC from DEMOC measure, to provide a single regime score that ranges from +10 (full democracy) to -10 (full autocracy).
+  4. **DURABLE**: Saves the number of years since the last substantive change in authority characteristics (defined as a 3-point change in the POLITY score).
+
+
+```{r polity5-indicators}
+
+Polity5 <-
+  
+  fread("Raw-data/Polity5.csv", na.strings = "",
+        select = c("ccode" = "integer",
+                   "year" = "integer",
+                   "democ" = "double",
+                   "autoc" = "double",
+                   "polity" = "double",
+                   "durable" = "integer")
+  
+  # According to the users’ manual polity 
+  # values out of [-10,10] have a special meaning
+  )[, government_status := fcase(polity == -66, "Interruption",
+                                polity == -77, "Interregnum",
+                                polity == -88, "Transition",
+                                default = "Active")
+  ][government_status != "Active", 
+    c("democ","autoc","polity") := NA_real_]
+
+
+glimpse(Polity5)
+
+```
+
+
+# Data understanding
+
+Before starting the cleaning process itself we need to understand some general characteristics of data. This step it's crucial in order to know *how to interpret the data* and *what cleaning step are needed*.
+
+## Validation process
+
+Once we have all the data in R we can start to check the information that contains each column of `ProtestRaw`, as there is no documentation related to the main data we need to check if the columns really have what we think after reading each title:
+
+- **id** shares an unique number for each row. And we see the test bellow.
+
+```{r id-test}
+
+ProtestRaw[, .(`Number of Rows` = .N,
+               `Number of Ids` = uniqueN(id))] |>
+  style_table()
+
+```
+
+- **country** stores the names of countries where each protest happened. This dataset has information about 166 countries.
+
+```{r country-unique-count}
+
+ProtestRaw[,.(`Number of Countries` = uniqueN(country))] |>
+  style_table()
+
+```
+
+- **ccode** provides a code reference for each country. By making a simple check we can confirm that a country can have more than one code depending of the protest `year`, as we can see bellow.
+
+```{r ccode-year-change}
+
+ProtestRaw[order(year), 
+           .(ccode, year, n_country_ccode = uniqueN(ccode)),
+           by = "country"
+][n_country_ccode > 1, 
+  unique(.SD,by = "ccode"),
+  .SDcols = c("country","ccode","year")] |>
+  style_table()
+
+```
+
+As we don't know which rule is following the code let's use the data provided by the `countrycode` package to find out the `ccode` source. To make data that we need to perform a join operation in two parts by starting with countries that have the same name and year in both data frames.
+
+```{r ccode-exact-match}
+
+CountryCodeExactMatch <-
+  CountryCode[ProtestRaw[, unique(.SD), 
+                         .SDcols = c("country","ccode","year")],
+                on = c("country.name.en" = "country", "year"),
+                nomatch = 0]
+
+```
+
+To perform the join operation with the missing countries we need to apply a more complex approach by applying the following steps :
+
+1. Selecting the countries that wasn't found using a exact match
+2. Creating a table with all possible combinations between missing countries and regular expressions provided by `countrycode` package 
+3. Selecting rows that match the regular expression
+4. Adding possible country codes and years by regular expression
+5. Selecting rows with the same country and year as `ProtestRaw`
+
+```{r ccode-regex-match}
+
+CountryCodeRegexMatch <-
+  
+    # Selecting the countries that wasn't found using a exact match
+    ProtestRaw[! country %chin% CountryCodeExactMatch$country.name.en, 
+               .(country = unique(country))
+
+    # Creating country and regex combinations
+    ][, CJ(country = country,
+           country.name.en.regex = CountryCode$country.name.en.regex,
+           unique = TRUE)
+      
+    # Selecting regex that match with countries' names
+    ][, match_text := str_detect(str_to_lower(country), country.name.en.regex),
+      by = .I
+    ][match_text == TRUE,
+      unique(.SD, by = "country"),
+      .SDcols = c("country", "country.name.en.regex")
+
+    # Adding possible country codes and years by regular expression
+    ][CountryCode, on = "country.name.en.regex", nomatch = 0
+
+    # Selecting rows with the same country and year as ProtestRaw
+    ][ProtestRaw[, unique(.SD), .SDcols = c("country","ccode","year")],
+      on = c("country", "year"), nomatch = 0
+    ][, `:=`(country.name.en = country,
+             country = NULL)]
+
+```
+
+After applying all this steps we just need to bind both data frames and confirm if we found all possible country codes for every country listed in `ProtestRaw`.
+
+```{r ccode-match-result}
+
+CountryCodeConsolidated <-
+  rbind(CountryCodeExactMatch,
+        CountryCodeRegexMatch)
+
+# Checking it was any country and year that wasn't found
+ProtestRaw[, c("country","year")
+][!CountryCodeConsolidated, 
+  on = c("country" = "country.name.en","year")] |>
+  (\(x) data.table(`Missing Rows` = nrow(x)))() |>
+  style_table()
+
+```
+
+Great, now we can use `CountryCodeConsolidated` to identify which code source match better with the `ccode`.
+
+```{r}
+
+CountryCodeConsolidated[, melt(.SD, id.vars = c("country.name.en","ccode"),
+                         variable.name = "Country Code Source", value.name = "possible_code",
+                         variable.factor = FALSE, na.rm = TRUE),
+                  .SDcols = !patterns("^(year|country\\.name\\.en\\.regex)$")
+][, unique(.SD)
+][, .(`% Found` = mean(ccode == possible_code, na.rm = TRUE) |> percent(accuracy = 0.01),
+      `Number of Countries` = uniqueN(country.name.en)),
+  by = "Country Code Source"
+][order(-`% Found`,-`Country Code Source`)
+][1:8, style_table(.SD)]
+
+```
+
+As we can see in the table above the country code source with more matching codes is the [Polity V Project](http://www.systemicpeace.org/inscr/p5manualv2018.pdf) which monitor regime change and study the effects of regime authority worldwide. This open the door to add more features to our main data, but first it is important to understand why some the `p4n` didn't match with the original `ccode`.
+
+The **first group** is the one that has a `p4n` the value but it is different to the `ccode` during some years, as you can see bellow. We will correct the `ccode` in those cases during this project.
+
+```{r checking-wrong-code}
+
+CountryCodeConsolidated[p5n != ccode,
+                  .(start_year = min(year),
+                    end_year = max(year)),
+                  by = c("country.name.en","ccode","p5n")] |>
+  style_table()
+
+```
+
+The **second group** correspond to the years when the bellow countries didn't have a `p5n` assign, so we will remand the code that was given by `ccode`.
+
+```{r checking-missing-code}
+
+CountryCodeConsolidated[is.na(p5n),
+                        .(p5n = unique(p5n),
+                          start_year = min(year),
+                          end_year = max(year)),
+                        by = c("country.name.en","ccode")
+  ][1:8] |>
+  style_table()
+
+```
+
+- **region** classifies countries in 8 regions: North America, Central America, South America, Europe, Africa, MENA, Asia and Oceania.
+
+- **location** identifies in which cites the protest took place. Even though the data it's very messy we might extract some useful information from it.
+
+```{r location-check}
+
+  ProtestRaw[country == "United Kingdom", .N,
+             .(country, location)
+  ][order(-N)
+  ][location %like% ",|Edinburgh"
+  ][1:5] |>
+    style_table()
+
+```
+
+- **protest** shows 1 when the row is related to a protest and 0 otherwise.
+
+- **year**, **startyear**, **startmonth**  and **startday** define when each protest took place.
+
+```{r start-year-check}
+
+  ProtestRaw[, .(`% of year equals to startyear` = 
+                   mean(year == startyear, na.rm = TRUE)|> percent())] |>
+    style_table() |>
+    align(j = 1, align = "center")
+
+```
+
+- **endyear**, **endmonth**  and **endday** defines when each protest ended.
+
+- **protestnumber** counts the number of protests that have occurred during a year in a particular country, but the next table shows the exception to the rule.
+ 
+  - Cambodia in 2003 is missing the first protestnumber
+  - Cambodia in 2004 is missing the second protestnumber
+  - Yugoslavia in 1992 is duplicating the first protestnumber
+
+As we can not ask any one why that happen we will assume that this was a collection problem and we can correct them during the cleaning process.
+
+```{r protestnumber-exceptions}
+
+  ProtestRaw[order(country,year,startmonth,startday), 
+             .(startmonth, startday, id, protestnumber ,
+               protest_num_check = max(protestnumber) != uniqueN(id) & 
+                                   sum(protest) != 0),
+             by = c("country","year")
+  ][protest_num_check == TRUE, !c("protest_num_check")
+  ][1:7
+  ][, c("id","year") := lapply(.SD,as.character), 
+    .SDcols = c("id","year")] |>
+    style_table()
+
+```
+
+- **protesterviolence** shows 1 when there was violence in the protester side and 0 otherwise.
+
+- **participants** has `r ProtestRaw$participants |> uniqueN()` unique values and estimate the number of participants that were part of each protest. As you can see this column needs a lot of cleaning to be useful.
+
+```{r participants-check}
+
+  ProtestRaw[, .N, participants
+  ][c(1:3,(length(N)-3):length(N))] |>
+    style_table()
+
+```
+
+- **participants_category** has 6 categories to define the number of participants that participated in the protest. Then we will try to complete the missing values using the *participants* column.
+
+```{r participants_category-check}
+
+ProtestRaw[, .N, participants_category]|>
+  style_table()
+
+```
+
+- **protesteridentity** has information about the people who protest but some times has information about the protest itself as we can see in the next table.
+
+```{r protesteridentity-check}
+
+  ProtestRaw[, .N, protesteridentity
+  ][order(-N)
+  ][c(2:4,(length(N)-3):length(N))] |>
+  style_table()
+
+```
+
+- The **4 protesterdemand** columns have 7 categories to define protesters' requests.
+
+```{r protesterdemand-check}
+
+  ProtestRaw[, .SD, .SDcols = patterns("^id$|^protesterdemand")
+  ][, melt(.SD, id.vars = "id" , value.name = "Protester Demand")
+  ][`Protester Demand` %like% "\\w",
+    .(`Number of Protests` = uniqueN(id)), 
+    by = "Protester Demand"
+  ][order(-`Number of Protests`)] |>
+    style_table()
+
+```
+
+- The **7 stateresponse** columns have 7 categories to define States' responses. By checking the table bellow we can see that *accommodation* was misspelled as *accomodation* which also the attribute that we want to understand.
+
+```{r stateresponse-check}
+
+  ProtestRaw[, .SD, .SDcols = patterns("^id$|^stateresponse")
+  ][, melt(.SD, id.vars = "id", value.name = "State Response")
+  ][`State Response` %like% "\\w",
+    .(`Number of Protests` = uniqueN(id)), 
+    by = "State Response"
+  ][order(-`Number of Protests`)] |>
+    style_table()
+
+```
+
+- **notes** has a paragraph that describes each protest. The average number of words for each paragraph is ***98 words*** which is higher than median so there are some outliers with very long paragraphs.
+
+```{r notes-check}
+
+ProtestRaw[notes %like% "\\w", 
+           .(id, `Number of words` = str_squish(notes) |> str_count(" ")+1)
+          ][, word_avg := mean(`Number of words`)] |>
+  ggplot(aes(`Number of words`))+
+  geom_histogram(bins = 30, fill = "dodgerblue3")+
+  geom_vline(aes(xintercept = word_avg))+
+  scale_x_log10()+
+  labs(title = "Distribution of number of words per note")
+
+```
+
+- **sources** has a paragraph that describes where the is information is coming from. The average number of words for each paragraph is ***34 words*** which is higher than median so there are some outliers with very long paragraphs.
+
+```{r sources-check}
+
+ProtestRaw[sources %like% "\\w", 
+           .(id, `Number of words` = str_squish(sources) |> str_count(" ")+1)
+          ][, word_avg := mean(`Number of words`)] |>
+  ggplot(aes(`Number of words`))+
+  geom_histogram(bins = 30, fill = "dodgerblue3")+
+  geom_vline(aes(xintercept = word_avg))+
+  scale_x_log10()+
+  labs(title = "Distribution of number of words per source")
+
+```
+
+
+## Missing data distribution
+
+It is important to know that the data has ***`r nrow(ProtestRaw) |> comma()` rows***, but not all rows represent a protest, ***`r  ProtestRaw[protest == 0] |> nrow() |> comma()` rows*** of the data represent years where the wasn't any protest in a particular country. Let's see how is the missing value distribution in each case.
+
+```{r , fig.dim = c(14,10)}
+
+ProtestRaw[, lapply(.SD, function(x) x |> is.na() |> mean()),
+    by = .(protest = fifelse(protest>0,"Protest","No Protest"))
+  ][, melt(.SD, id.vars = "protest", 
+           variable.name = "Variables",
+           value.name = "# Missing")
+  ][, Variables := fct_reorder(Variables, `# Missing`, sum)] |>
+  ggplot(aes(`# Missing`, `Variables`))+
+  geom_blank(aes(x = `# Missing` *1.1))+
+  geom_col(fill = "dodgerblue3")+
+  geom_text(aes(label = percent(`# Missing`, accuracy = 0.01)),
+            hjust = -0.3)+
+  scale_x_continuous(labels = percent_format(accuracy = 1))+
+  facet_wrap(~protest)+
+  labs(title = "Proportions of missing values per variable",
+       x = "% Of Missing Values")
+
+```
+
+As we can check the rows that doesn't represent a protest are very empty. We will remove them as they won't be useful to answer the question.
+
+# Data cleaning process
+
+After checking the data feature by feature we got a better sense of the data and a better vision of the problems that need to be solved before getting insight from the data. 
+
+## Initial cleaning
+
+In this section we will apply simplest cleaning steps at once.
+
+```{r}
+
+ProtestSimpleClean <-
+  
+  # Fixing wrong ccodes
+  CountryCodeConsolidated[, .(country = country.name.en, year, p4n)
+  ][, unique(.SD)
+  ][ProtestRaw, on = c("country","year")
+  ][ccode != p4n, ccode := p4n
+  ][, !c("p4n")
+    
+  # Taking out rows that aren't related to a protest
+  ][protest == 1, !c("protest")
+        
+  # Transforming start and end dates to a date format
+  ][, `:=`(start_date =  
+             paste(startyear,startmonth,startday,sep = "-") |> ymd(),
+           end_date =  
+             paste(endyear,endmonth,endday,sep = "-") |> ymd())
+  ][order(start_date), 
+    .SD, .SDcols = !patterns("\\w+year$|\\w+month$|\\w+day$")
+   
+  # Correcting the protestnumber of each year and country
+  ][, protestnumber := 1:.N,
+    by = c("country","year")
+    
+  # Setting Country and Location Case
+  ][,`:=`(location = lower_clean_name(location) |> 
+                     str_replace_all("kiev","kyiv") |>
+                     str_replace_all("chittagong","chattogram"),
+          country = lower_clean_name(country)) ]
+
+```
+
+
+## Completing participants_category with participants column
+
+As the `participants` column contains aproximations related to number of people who took place during each protests makes more same to complete the missing `participants_category` based on those approximations by using the next code.
+
+```{r completing-participants-category}
+
+ProtestCategoryClean <-
+  
+  # Let's work only with protests that are missing participants_category
+  ProtestSimpleClean[is.na(participants_category)
+                     
+  # Applying general cleaning to participants
+  ][,participants := participants |>  
+                      str_to_lower() |> 
+                      str_remove_all(",") |>
+                      str_squish()
+    
+  # Getting the average of participants intervals
+  ][, c("min","max") := tstrsplit(participants,"-| to ", fixed = FALSE)
+  ][participants %like% "between \\d+ and \\d+", 
+    `:=`(min = str_match(participants, "between (\\d+) and \\d+")[,2],
+         max = str_match(participants, "between \\d+ and (\\d+)")[,2])
+  ][, c("min","max") := lapply(.(min, max), 
+                               \(x) str_extract(x, "\\d+") |> as.double())
+  ][, `:=`(participants_clean = (min+max)/2,
+           min = NULL,
+           max = NULL)
+    
+  # Getting number of protesters by using regular expressions
+  ][participants %like% "^\\d+$" & is.na(participants_clean),
+    participants_clean := 
+      as.double(participants)
+  ][participants %like% "^\\d+\\+$" & is.na(participants_clean),
+    participants_clean := 
+      str_remove_all(participants,"\\+") |> 
+      as.double()
+  ][participants %like% "^\\d+s" & is.na(participants_clean),
+    participants_clean :=
+      str_match(participants,"^(\\d+)s")[,2] |>  
+      as.double()
+  ][participants %like% "^[><]\\d+" & is.na(participants_clean),
+    participants_clean := 
+      str_match(participants,"^[><](\\d+)")[,2] |>
+      as.double()
+    
+  # Getting number of protesters by reading the notes variable
+  ][id == 922006004, 
+    participants_clean := 50
+  ][id == 6602002005, 
+    participants_clean := 2000
+    
+  # Creating a new participants_category variable
+  ][, `:=`(participants_category = 
+             fcase( between(participants_clean, 1, 99), "1-99",
+                    between(participants_clean, 100, 999), "100-999",
+                    between(participants_clean, 1000, 1999), "1000-1999",
+                    between(participants_clean, 2000, 4999), "2000-4999",
+                    between(participants_clean, 5000, 10000), "5000-10000",
+                    participants_clean > 10000, ">10000"),
+           participants_clean = NULL)
+    
+  # Adding protests that aren't missing participants_category  
+  ][, rbind(.SD,
+            ProtestSimpleClean[!is.na(participants_category)])
+    
+  # Making participants_category a factor variable 
+  # to make easier to plot the data later
+  ][participants_category == "50-99",
+    participants_category := "1-99"
+  ][, `:=`(participants_category = factor(participants_category,
+                                          levels = c("Missing",   "1-99",     
+                                                     "100-999",   "1000-1999", 
+                                                     "2000-4999", "5000-10000",
+                                                     ">10000")),
+           participants = NULL)]
+
+
+  ProtestCategoryClean[, .N, participants_category] |>
+    style_table()
+
+```
+
+There 11 protests where the wasn't any information about the number of participants and label them as Missing.
+
+## Reshaping protesterdemand and stateresponse
+
+Now we reorganize the `protesterdemand` and `stateresponse` to have a single column for each category having 1 if the each category is related to the protest and 0 otherwise.
+
+```{r reshaping-data}
+
+ProtestReshaped <-
+  
+  # Melting protesterdemand and stateresponse just keeping protest id
+  ProtestCategoryClean[, melt(.SD, id.vars = "id",
+                              measure.vars =
+                                str_subset(names(.SD),
+                                           "^(protesterdemand|stateresponse)"),
+                              value.name = "actions",
+                              variable.factor = FALSE)
+  ][actions %like% "\\w"
+  ][,`:=`(variable = fifelse(variable %like% "^protesterdemand", 
+                             "demand","response"),
+          actions = fifelse(actions == "accomodation",
+                            "accommodation",actions),
+          action_occur = TRUE)
+  ][, unique(.SD) 
+  ][, dcast(.SD, id ~ variable + actions, 
+            value.var = "action_occur", fill = FALSE)
+    
+    
+  # Adding the other variables to have back the data complete
+  ][, merge(.SD, 
+            ProtestCategoryClean, 
+            by = "id", all = TRUE)
+  ][, .SD, 
+    .SDcols = !patterns("^(protesterdemand|stateresponse)")
+  ][,{ 
+    ColsToFill <- str_subset(names(.SD),"^(demand|response)")
+    copy(.SD)[is.na(response_shootings), (ColsToFill) := FALSE]
+  }][, protesterviolence := protesterviolence == 1]
+
+```
+
+After applying those changes we can see that currently all the columns have less
+than 5% of missing values.
+
+```{r}
+
+ProtestReshaped[, lapply(.SD, function(x) mean(is.na(x)))
+  ][, id := 1
+  ][, melt(.SD, id.vars = "id", 
+           variable.name = "Variables",
+           value.name = "# Missing")
+  ][, `:=`(Variables = fct_reorder(Variables, `# Missing`, sum))] |>
+  ggplot(aes(`# Missing`, `Variables`))+
+  geom_blank(aes(x = `# Missing` *1.15))+
+  geom_col(fill = "dodgerblue3")+
+  geom_text(aes(label = percent(`# Missing`, accuracy = 0.01)), hjust = -0.3)+
+  scale_x_continuous(labels = percent_format(accuracy = 0.01))+
+  expand_limits(x = 1)+
+  labs(title = "Proportions of missing\nvalues per variable",
+       x = "% Of Missing Values")
+
+```
+
+## Joining policatical situation
+
+As we already confirmed that the data is related to Center for Systemic Peace data adding the variables to the main data can be done in one line of code.
+
+```{r}
+
+ProtestPolitical <-
+  Polity5[ProtestReshaped, on = c("ccode","year")]
+
+```
+
+## Extracting location data
+
+As we know in the column `location` there is information about the place where each protests took place. I would be really interesting to extract from that field the following information:
+
+1. Does it mention if it was a national protest?
+2. How many cities mention each protest?
+3. Did the protest took place in the capital?
+
+To achieve that we need to make the process in 3 steps.
+
+- In the first step we need check in the `location` field mention if the protest took place nationality and identify the cities that have a perfect math with the `WorldCities` data frame.
+
+```{r location-extraction}
+
+NationalRegex <-
+  "nationwide|(^| )national( level| including| in scope|.+cities|$|[:;,\\.])|across (.*country|"
+
+CustomStopWords <-
+  c(stop_words$word, tm::stopwords("spanish"), "region",
+    "province", "district", "valley", "including","cities",
+    "shire", "downtown", "national", "parliament")
+
+ProtestExactCityMatch <-
+  WorldCities[, .(city_regex = str_c(city_ascii,collapse = "|")),
+              by = "country"
+  ][ProtestPolitical, on = "country"
+  ][, `:=`(exact_cities_found = .(str_extract_all(location, city_regex) |> 
+                                    unlist() |> 
+                                    unique()),
+           is_national = location %like% str_c(NationalRegex, country,")"),
+           location_no_found = str_remove_all(location, city_regex) |>
+                               str_remove_all(str_c(NationalRegex, country,")")) |>
+                               str_squish()),
+    by = "id"
+  ][,`:=`(num_cities = sapply(exact_cities_found, length),
+          city_regex = NULL)
+  ][!location_no_found %like% "\\w" |
+      location_no_found %chin% CustomStopWords,
+    location_no_found := NA_character_]
+
+```
+
+After extracting all matching cities and checking if the location field identified each protest as a national one we saved the remaining words in the variable `location_no_found` for further analysis.
+
+- Assuming the in many cases of `location_no_found` the remaining words just make reference to one city we can compare all the cities of each country and take the city that  minimize the LCS (longest common sub-string distance) measure from the `stringdist` package.
+
+```{r}
+
+StringApproxCols <- 
+  c("id", "country", "location", "location_no_found", "num_cities")
+
+OneWorldCityApprox <-
+  ProtestExactCityMatch[!is.na(location_no_found), ..StringApproxCols] |>
+  find_string_approximation(DT2 = WorldCities[,.(country, city_ascii)],
+                            id.var = "id",
+                            merge.by = "country",
+                            match.vars = c("location_no_found","city_ascii")) |>
+  setnames("location_no_found","city_word")
+```
+
+At the end, we could find `r uniqueN(OneWorldCityApprox$id)` protest cities. but that with that we can find cities if the field describes more than one city. To check that let's see the number of words distribution.
+
+```{r}
+
+plot_word_found_distribution(ProtestExactCityMatch,
+                             word.count.var = "location_no_found",
+                             prostest.id.found = OneWorldCityApprox$id,
+                             success.label = "City found",
+                             no.found.label = "City no found",
+                             label.colors = c("City found" = "dodgerblue3",
+                                              "City no found" = "brown2"),
+                             subtitle = "After applying one city approximation match")
+
+```
+
+As we can see most of the cities found only have one of two words and only some few one have 3 or 4 words. It is all also important to check that rows with one word didn't find any city related so we can take those cases out as we won't any extra city related those cases.
+
+```{r}
+
+ManyWorldCityApprox <-
+  lapply(1:4, function(n_gram){
+  ProtestExactCityMatch[!is.na(location_no_found) &
+                          str_count(location_no_found," ") >= 1 &
+                          !id %in% OneWorldCityApprox$id,
+                        unnest_tokens(.SD, city_word,location_no_found,
+                                      token = "ngrams", n = n_gram),
+                        .SDcols = StringApproxCols
+  ][! city_word %chin% CustomStopWords,
+    find_string_approximation(.SD,
+                              DT2 = WorldCities[,.(country, city_ascii)],
+                              id.var = "id",
+                              merge.by = "country",
+                              match.vars = c("city_word","city_ascii"))
+  ][, n_gram := n_gram]}) |>
+  rbindlist() 
+
+```
+
+In next chart we can see how we could find cities in very long text with more than 20 words by applying string distance approximation.
+
+```{r}
+
+plot_word_found_distribution(ProtestExactCityMatch,
+                             word.count.var = "location_no_found",
+                             prostest.id.found = c(OneWorldCityApprox$id,
+                                                   ManyWorldCityApprox$id),
+                             success.label = "City found",
+                             no.found.label = "City no found",
+                             label.colors = c("City found" = "dodgerblue3",
+                                              "City no found" = "brown2"),
+                             subtitle = "After applying many city approximation match")
+
+```
+
+Now it's time to add the cities found to the main data.
+
+```{r}
+
+ProtestLocationExtracted <-
+  list(OneWorldCityApprox[, c("id","country","city_ascii")],
+       ManyWorldCityApprox[, c("id","country","city_ascii")],
+       ProtestExactCityMatch[, .(city_ascii = exact_cities_found[[1]]),
+                             by = c("id","country")]) |>
+  rbindlist() |>
+  unique() |>
+  merge(WorldCities,
+        by = c("country","city_ascii"), all.x = TRUE) |>
+  (\(DT) DT[, .(cities_found = .(city_ascii),
+                num_cities = .N,
+                in_capital = sum(capital == "primary",na.rm = TRUE) > 0,
+                total_population = sum(population, na.rm = TRUE)),
+            by = "id"
+         ][ProtestExactCityMatch[,!c("exact_cities_found",
+                                     "num_cities",
+                                     "location_no_found",
+                                     "location")],
+           on = "id"
+         ][is.na(num_cities), 
+           `:=`(num_cities = 0,
+                in_capital = FALSE)])()
+
+```
+
+## Final Result
+
+After applying many transformations to the data we are ready to explore it. The new data it is tidy format and we will easy to manipulate across the exploration process.
+
+```{r}
+
+glimpse(ProtestLocationExtracted)
+
+```
+
+
+# Data exploration
+
+
+## Correlation network summary
+
+A we can see the data have some numeric and logical variables that can be converted to numeric. It would be really interesting if we can confirm which variables go in same or opposite directions. To find out that we can use the `correlation` function from the **correlation** which also give us confident intervals to confirm that the correlation are statistician significance.
+
+The first step it's to take out variables that don't bring big insights and case of finding any relation, then we select logical and numeric variables and calculate correlations.
+
+```{r}
+
+CorSummary <-
+  ProtestLocationExtracted[, !c("id","ccode","democ","autoc", "durable")
+  ][, participants_category := as.integer(participants_category)
+  ][, lapply(.SD, \(x) x * 1),
+    .SDcols = \(x) is.logical(x) | is.numeric(x)] |> 
+  correlation::correlation() |>
+  as.data.table()
+
+CorSummary[1:6,
+           lapply(.SD, \(x) if(is.numeric(x)){round(x,2)}else{x})] |>
+  style_table()
+
+```
+
+
+
+```{r}
+
+set.seed(50) 
+CorSummary[p < 0.05 & r >= 0.10
+][, cor_category := cut(r,0:5*2/10)] |>
+graph_from_data_frame(directed = FALSE) |>
+  ggraph(layout = "with_graphopt")+
+  geom_edge_link(aes(edge_color = cor_category), 
+                 edge_width = 1)+
+  geom_node_point(size = 3)+
+  geom_node_text(aes(label = name), repel = TRUE)+
+  scale_edge_color_brewer(palette = "PuBu")+
+  labs(title = "Positive significan correlations")+
+  theme(legend.position = "top",
+        legend.title = element_blank())
+
+```
+
+By checking the last report chart we can say:
+
+1. Violent state responses like beatings, arrests, crowd dispersal, shootings and killings are correlated with violence from the protester side.
+2. Removing politician is a reason that moves many people (`participants_category`) and most of the time takes place in the capital and other cities in the nation several times in a year (`protestnumber`) and happens usually in countries more democratic than autocratic (`polity`).
+3. Labor wage disputes have a national presence and usually take place in democratic (`polity`) countries.
+4. The most common response in democratic countries it's to ignore protests.
+
+Let's confirm those findings adding other charts to see with extra details of each relation.
+
+
+### Protester violence relations
+
+```{r}
+
+melt.data.table(ProtestLocationExtracted,
+                id.vars = c("id","protesterviolence"),
+                measure.vars = str_subset(names(ProtestLocationExtracted),"response"),
+                variable.name = "response",
+                variable.factor = FALSE,
+                value.name = "response_happen"
+  )[response_happen == TRUE, 
+    .(number_protest = uniqueN(id)),
+    by = c("protesterviolence","response")
+  ][, violence_pct := number_protest[protesterviolence]/sum(number_protest),
+    by = "response"
+  ][, response := fct_reorder(response, violence_pct, unique)] |>
+  ggplot(aes(number_protest, response, fill = protesterviolence))+
+  geom_col(position = position_fill(), alpha = 0.85)+
+  geom_vline(aes(xintercept = 0.5), size = 0.75)+
+  scale_x_continuous(labels = percent_format(accuracy = 1))+
+  scale_fill_manual(values = c("TRUE" = "brown2",
+                               "FALSE" = "dodgerblue3"))+
+  labs(title = "Proportion of protester violence\nby response category",
+       y = "", x = "Proportion of protests (%)",
+       fill = "Protester Violence")+
+  theme(legend.position = "top")
+
+```
+
+For example, when states response with killings the 75% percent of protests were violent.
+
+
+### Polity ingnore
+
+```{r}
+
+ProtestLocationExtracted[!is.na(polity),
+                         melt(.SD, 
+                              measure.vars = str_subset(names(ProtestLocationExtracted),
+                                                        "demand"),
+                              variable.name = "demands",
+                              variable.factor = FALSE,
+                              value.name = "happen")
+][happen == TRUE,
+  .(accommodation_pct = mean(response_accommodation),
+    n = uniqueN(id)),
+  by = .(#participants_category,
+         demands = sub("demand_","",demands),
+         polity = fcase(polity < quantile(polity,0.25), "<Q1",
+                        polity < quantile(polity,0.50), "[Q1-Q2)",
+                        polity < quantile(polity,0.75), "[Q2-Q3)",
+                        polity >= quantile(polity,0.75),">=Q3") |>
+           factor(levels = c("<Q1", "[Q1-Q2)", "[Q2-Q3)",">=Q3")))] |>
+  ggplot(aes(polity, demands, fill = accommodation_pct ))+
+  geom_tile()+
+  geom_text(aes(label = accommodation_pct |> 
+                        percent(accuracy = 0.01) |>
+                        paste0(" | ", n),
+                size = 7),
+            fontface = "bold")+
+  scale_fill_gradient(low = "white", high = "red")+
+  theme_classic()+
+  theme(axis.text = element_text(size = 15),
+        axis.title = element_text(size = 16, face = "bold"),
+        strip.text = element_text(size = 16, face = "bold"),
+        plot.title = element_text(size = 25, face = "bold", 
+                                  hjust = 0.5, margin = margin(b = 15)),
+        legend.position = "none")
+
+
+```
+
+
+
+
+Arel-Bundock, Vincent, Nils Enevoldsen, and CJ Yetman, (2018). countrycode: An R package to convert country names and country codes. Journal of Open Source Software, 3(28), 848, https://doi.org/10.21105/joss.00848
+
+https://www.systemicpeace.org/inscrdata.html
+
+Center for Systemic Peace
+
+https://simplemaps.com/data/world-cities
+
+https://www.bragitoff.com/2016/03/english-dictionary-in-csv-format/
+
+https://www.mso.anu.edu.au/~ralph/OPTED/
+
