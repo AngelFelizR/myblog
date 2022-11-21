@@ -47,7 +47,7 @@ To make that possible we will apply the next skills during the process:
 - **Functional programming** with *R*
 - **Data manipulation** with *data.table*, *lubridate* and *stringr*
 - **Text mining** with *tidytext*
-- **Data visualization** with *ggplot2*, *scales* and *forcats*
+- **Data visualization** with *ggplot2*, *scales*, *forcats* and *patchwork*
 - **Network visualization** with *igraph* and *ggraph*
 - **Automated reporting** with *quarto*, *flextable*, *html* and *css*
 
@@ -799,7 +799,7 @@ ProtestReshaped <-
                               variable.factor = FALSE)
   ][actions %like% "\\w"
   ][,`:=`(variable = fifelse(variable %like% "^protesterdemand", 
-                             "demand","response"),
+                             "dem","res"),
           actions = fifelse(actions == "accomodation",
                             "accommodation",actions),
           action_occur = TRUE)
@@ -815,8 +815,8 @@ ProtestReshaped <-
   ][, .SD, 
     .SDcols = !patterns("^(protesterdemand|stateresponse)")
   ][,{ 
-    ColsToFill <- str_subset(names(.SD),"^(demand|response)")
-    copy(.SD)[is.na(response_shootings), (ColsToFill) := FALSE]
+    ColsToFill <- str_subset(names(.SD),"^(dem|res)")
+    copy(.SD)[is.na(res_shootings), (ColsToFill) := FALSE]
   }][, protesterviolence := protesterviolence == 1]
 
 ```
@@ -1010,12 +1010,11 @@ glimpse(ProtestLocationExtracted)
 
 # Data exploration
 
-
-## Correlation network summary
-
 A we can see the data have some numeric and logical variables that can be converted to numeric. It would be really interesting if we can confirm which variables go in same or opposite directions. To find out that we can use the `correlation` function from the **correlation** which also give us confident intervals to confirm that the correlation are statistician significance.
 
-The first step it's to take out variables that don't bring big insights and case of finding any relation, then we select logical and numeric variables and calculate correlations.
+## Exploring numeric correlations
+
+The first step it's to take out variables that don't bring big insights and case of finding any relation, then we select logical and numeric variables and calculate correlations for all numeric and logical variables.
 
 ```{r getting-correlation}
 
@@ -1033,30 +1032,28 @@ CorSummary[1:6,
 
 ```
 
-
+As we have many significant correlations, let's center our attention in higher significan ones
 
 ```{r correlation-network}
 
-set.seed(50) 
-CorSummary[p < 0.05 & r >= 0.10
-][, cor_category := cut(r,0:5*2/10)] |>
-graph_from_data_frame(directed = FALSE) |>
-  ggraph(layout = "with_graphopt")+
-  geom_edge_link(aes(edge_color = cor_category), 
+set.seed(50)
+CorSummary[p < 0.05 & abs(r) >= 0.10] |>
+  graph_from_data_frame(directed = FALSE) |>
+  ggraph(layout = "with_dh")+
+  geom_edge_link(aes(edge_color = r), 
                  edge_width = 1)+
   geom_node_point(size = 3)+
   geom_node_text(aes(label = name), repel = TRUE)+
-  scale_edge_color_brewer(palette = "PuBu")+
-  labs(title = "Positive significan correlations")+
-  theme(legend.position = "top",
-        legend.title = element_blank())
+  scale_edge_color_gradient2(low = "red", high = "blue")+
+  labs(title = "Correlation Network")
+             
 
 ```
 
-By checking the last report chart we can say:
+By checking the last report chart we can see some interesting relations:
 
 1. Violent state responses like beatings, arrests, crowd dispersal, shootings and killings are correlated with violence from the protester side.
-2. Removing politician is a reason that moves many people (`participants_category`) and most of the time takes place in the capital and other cities in the nation several times in a year (`protestnumber`) and happens usually in countries more democratic than autocratic (`polity`).
+2. Removing politician is a reason that moves many people (`participants_category`) several times in a year (`protestnumber`) and most of the time takes place in the country capital.
 3. Labor wage disputes have a national presence and usually take place in democratic (`polity`) countries.
 4. The most common response in democratic countries it's to ignore protests.
 
