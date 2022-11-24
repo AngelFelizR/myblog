@@ -1036,7 +1036,7 @@ As we have many significant correlations, let's center our attention in higher s
 
 ```{r correlation-network}
 
-set.seed(50)
+set.seed(110)
 CorSummary[p < 0.05 & abs(r) >= 0.10] |>
   graph_from_data_frame(directed = FALSE) |>
   ggraph(layout = "with_dh")+
@@ -1052,13 +1052,16 @@ CorSummary[p < 0.05 & abs(r) >= 0.10] |>
 
 By checking the last report chart we can see some interesting relations:
 
-1. Violent state responses like beatings, arrests, crowd dispersal, shootings and killings are correlated with violence from the protester side.
-2. Removing politician is a reason that moves many people (`participants_category`) several times in a year (`protestnumber`) and most of the time takes place in the country capital.
-3. Labor wage disputes have a national presence and usually take place in democratic (`polity`) countries.
-4. The most common response in democratic countries it's to ignore protests.
+1. If protesters present violence during the manifestation it is more probable that the state responds with shootings, killings, beatings and arrests in countries with low democracy (`polity`) other wise it's more common for states to ignore the protests and crowd dispersal is independent from polity levels.
+
+2. Labor wage disputes takes place nationally in democratic countries with a low change of sharing the protest purpose demanding police brutality reduction.
+
+3. Removal a politician usually takes place in the capital of countries with low polity with many participants several times a in a year.
+
+4. When a protest is demanding a political behavior it's weird to see that protesters want other demands.  
+
 
 Let's confirm those findings adding other charts to see with extra details of each relation.
-
 
 ### Protester violence relations
 
