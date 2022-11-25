@@ -1027,7 +1027,8 @@ CorSummary <-
   as.data.table()
 
 CorSummary[1:6,
-           lapply(.SD, \(x) if(is.numeric(x)){round(x,2)}else{x})] |>
+           lapply(.SD, \(x) if(is.numeric(x)){round(x,2)}else{x}),
+           .SDcols = !patterns("^(t|df_error)$")] |>
   style_table()
 
 ```
@@ -1050,7 +1051,7 @@ CorSummary[p < 0.05 & abs(r) >= 0.10] |>
 
 ```
 
-By checking the last report chart we can see some interesting relations:
+By checking the last graph, we can see some interesting relations:
 
 1. If protesters present violence during the manifestation it is more probable that the state responds with shootings, killings, beatings and arrests in countries with low democracy (`polity`) other wise it's more common for states to ignore the protests and crowd dispersal is independent from polity levels.
 
@@ -1063,34 +1064,42 @@ By checking the last report chart we can see some interesting relations:
 
 Let's confirm those findings adding other charts to see with extra details of each relation.
 
-### Protester violence relations
 
-```{r protester-violance-state-response-plot}
+### Distribution
 
-melt.data.table(ProtestLocationExtracted,
-                id.vars = c("id","protesterviolence"),
-                measure.vars = str_subset(names(ProtestLocationExtracted),"response"),
-                variable.name = "response",
-                variable.factor = FALSE,
-                value.name = "response_happen"
-  )[response_happen == TRUE, 
-    .(number_protest = uniqueN(id)),
-    by = c("protesterviolence","response")
-  ][, violence_pct := number_protest[protesterviolence]/sum(number_protest),
-    by = "response"
-  ][, response := fct_reorder(response, violence_pct, unique)] |>
-  ggplot(aes(number_protest, response, fill = protesterviolence))+
-  geom_col(position = position_fill(), alpha = 0.85)+
-  geom_vline(aes(xintercept = 0.5), size = 0.75)+
-  scale_x_continuous(labels = percent_format(accuracy = 1))+
-  scale_fill_manual(values = c("TRUE" = "brown2",
-                               "FALSE" = "dodgerblue3"))+
-  labs(title = "Proportion of protester violence\nby response category",
-       y = "", x = "Proportion of protests (%)",
-       fill = "Protester Violence")+
-  theme(legend.position = "top")
+- Adding Confident Intervals
+- Adding text to identify each side meaning
+
+```{r}
+
+ProtestLocationExtracted[!is.na(polity), 
+                         melt(.SD, id.vars = c("id","polity","protesterviolence"),
+                              value.name = "Happen",
+                              variable.name = "Response",na.rm = TRUE), 
+                         .SDcols = patterns("^(id|polity|protesterviolence)$|^res")
+][, .(occurrence_prop = mean(Happen)),
+  by = .(`Protester Violence` = protesterviolence,
+         Polity = fifelse(polity <= 4, "Low Democracy", "High Democracy"),
+         Response = sub("^res_","",Response) |> str_to_title())
+][, dcast(.SD, ... ~ Polity, value.var = "occurrence_prop")
+][, `occurrence_prop_high/low_democracy` := log2(`High Democracy`/`Low Democracy`)
+][, Response := fct_reorder(Response, `occurrence_prop_high/low_democracy`, sum)] |>
+  ggplot(aes(`occurrence_prop_high/low_democracy`, Response, color = `Protester Violence`))+
+  geom_point(size = 4)+
+  geom_vline(aes(xintercept = 0), size = 1)+
+  scale_x_continuous(breaks = breaks_width(0.5))+
+  scale_color_manual(values = c("FALSE" = "dodgerblue3", "TRUE" = "brown2"))+
+  labs(title = "State Response Exploration",
+       y = "State Response", 
+       x = "Log of Odds Ratio:\nResponse Occurrence Between High/Low Democratic Countries")+
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.position = "top")
+  
 
 ```
+
+
 
 For example, when states response with killings the 75% percent of protests were violent.
 
