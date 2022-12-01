@@ -1,7 +1,7 @@
 ---
 title: "Characteristics of Successful Protests"
 author: "Angel Feliz"
-date: "17 November 2022"
+date: "25 December 2022"
 execute:
   echo: true
   message: false
@@ -63,6 +63,9 @@ Libraries are very useful, but they can change over time making that the code us
 
 ```{r package-version-check}
 
+#| echo: false
+#| include: false
+
 if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
 renv::restore()
 
@@ -89,6 +92,7 @@ library(tidytext)
 glimpse <- pillar::glimpse
 codelist_panel <- countrycode::codelist_panel
 correlation <- correlation::correlation
+here <- here::here
 ```
 
 
@@ -232,7 +236,8 @@ In this section we will take the data available and load it into R as `data.tabl
 ```{r main-data-importation}
 
 ProtestRaw <-
-  fread("Raw-data/protest_data.csv", na.strings = "", integer64 = "double")
+  fread(here("Raw-data/protest_data.csv"), 
+        na.strings = "", integer64 = "double")
 
 glimpse(ProtestRaw)
 
@@ -247,7 +252,7 @@ Let's import complementary data to make sense, clean and expand the information 
 ```{r country-cities-data}
 
 WorldCities <-
-  fread("Raw-data/worldcities.csv", na.strings = "", sep=",",
+  fread(here("Raw-data/worldcities.csv"), na.strings = "", sep=",",
         select = c("country","city_ascii","capital","population")
   )[order(country,-population)
     
@@ -308,7 +313,7 @@ This data comes from the [Polity5 Annual Time-Series, 1946-2018](https://www.sys
 
 Polity5 <-
   
-  fread("Raw-data/Polity5.csv", na.strings = "",
+  fread(here("Raw-data/Polity5.csv"), na.strings = "",
         select = c("ccode" = "integer",
                    "year" = "integer",
                    "democ" = "double",
@@ -445,9 +450,10 @@ Great, now we can use `CountryCodeConsolidated` to identify which code source ma
 ```{r}
 
 CountryCodeConsolidated[, melt(.SD, id.vars = c("country.name.en","ccode"),
-                         variable.name = "Country Code Source", value.name = "possible_code",
-                         variable.factor = FALSE, na.rm = TRUE),
-                  .SDcols = !patterns("^(year|country\\.name\\.en\\.regex)$")
+                               variable.name = "Country Code Source", 
+                               value.name = "possible_code",
+                               variable.factor = FALSE, na.rm = TRUE),
+                        .SDcols = !patterns("^(year|country\\.name\\.en\\.regex)$")
 ][, unique(.SD)
 ][, .(`% Found` = mean(ccode == possible_code, na.rm = TRUE) |> percent(accuracy = 0.01),
       `Number of Countries` = uniqueN(country.name.en)),
@@ -1099,47 +1105,47 @@ ProtestLocationExtracted[!is.na(polity),
 
 ```
 
-
-
 For example, when states response with killings the 75% percent of protests were violent.
 
 
+```{r accommodation-pct-polity-plot}
+#| echo: false
+
 ### Polity ignore
 
-```{r accommodation-pct-polity-plot}
 
-ProtestLocationExtracted[!is.na(polity),
-                         melt(.SD, 
-                              measure.vars = str_subset(names(ProtestLocationExtracted),
-                                                        "demand"),
-                              variable.name = "demands",
-                              variable.factor = FALSE,
-                              value.name = "happen")
-][happen == TRUE,
-  .(accommodation_pct = mean(response_accommodation),
-    n = uniqueN(id)),
-  by = .(#participants_category,
-         demands = sub("demand_","",demands),
-         polity = fcase(polity < quantile(polity,0.25), "<Q1",
-                        polity < quantile(polity,0.50), "[Q1-Q2)",
-                        polity < quantile(polity,0.75), "[Q2-Q3)",
-                        polity >= quantile(polity,0.75),">=Q3") |>
-           factor(levels = c("<Q1", "[Q1-Q2)", "[Q2-Q3)",">=Q3")))] |>
-  ggplot(aes(polity, demands, fill = accommodation_pct ))+
-  geom_tile()+
-  geom_text(aes(label = accommodation_pct |> 
-                        percent(accuracy = 0.01) |>
-                        paste0(" | ", n),
-                size = 7),
-            fontface = "bold")+
-  scale_fill_gradient(low = "white", high = "red")+
-  theme_classic()+
-  theme(axis.text = element_text(size = 15),
-        axis.title = element_text(size = 16, face = "bold"),
-        strip.text = element_text(size = 16, face = "bold"),
-        plot.title = element_text(size = 25, face = "bold", 
-                                  hjust = 0.5, margin = margin(b = 15)),
-        legend.position = "none")
+# ProtestLocationExtracted[!is.na(polity),
+#                          melt(.SD, 
+#                               measure.vars = str_subset(names(ProtestLocationExtracted),
+#                                                         "demand"),
+#                               variable.name = "demands",
+#                               variable.factor = FALSE,
+#                               value.name = "happen")
+# ][happen == TRUE,
+#   .(accommodation_pct = mean(response_accommodation),
+#     n = uniqueN(id)),
+#   by = .(participants_category,
+#          demands = sub("demand_","",demands),
+#          polity = fcase(polity < quantile(polity,0.25), "<Q1",
+#                         polity < quantile(polity,0.50), "[Q1-Q2)",
+#                         polity < quantile(polity,0.75), "[Q2-Q3)",
+#                         polity >= quantile(polity,0.75),">=Q3") |>
+#            factor(levels = c("<Q1", "[Q1-Q2)", "[Q2-Q3)",">=Q3")))] |>
+#   ggplot(aes(polity, demands, fill = accommodation_pct ))+
+#   geom_tile()+
+#   geom_text(aes(label = accommodation_pct |> 
+#                         percent(accuracy = 0.01) |>
+#                         paste0(" | ", n),
+#                 size = 7),
+#             fontface = "bold")+
+#   scale_fill_gradient(low = "white", high = "red")+
+#   theme_classic()+
+#   theme(axis.text = element_text(size = 15),
+#         axis.title = element_text(size = 16, face = "bold"),
+#         strip.text = element_text(size = 16, face = "bold"),
+#         plot.title = element_text(size = 25, face = "bold", 
+#                                   hjust = 0.5, margin = margin(b = 15)),
+#         legend.position = "none")
 
 
 ```
