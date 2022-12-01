@@ -1,7 +1,7 @@
 ---
 title: "Characteristics of Successful Protests"
 author: "Angel Feliz"
-date: "17 November 2022"
+date: "25 December 2022"
 execute:
   echo: true
   message: false
@@ -22,28 +22,36 @@ categories: [Data Cleaning, Text Mining]
 ---
 
 <style>
+
 code{color: #0c5bd1;}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
 </style>
-
-# Motiviation to create the proyect {.unnumbered .unlisted}
-
-As data scientist aspirant I was trying to find an interesting dataset which I can use to practice and share what I have learnt so far, when I found out that Datacamp has a [Github repository](https://github.com/datacamp/careerhub-data) with many uncleaned datasets to that I could use.
-
-I saw the folder [Mass Protest Data](https://github.com/datacamp/careerhub-data/tree/master/Mass%20Protest%20Data) very interesting as it describes protests from 1990 to 2020 worldwide. I understand that protests are important to the society and it would be interesting to check what can we learn from this dataset.
 
 # Introduction {.unnumbered}
 
-The goal of the blog is to define what characteristics share successful protests worldwide and the first step to achieve that it is to define what do I mean with **successful**. As most the protests demand state actions _I consider that a **protest is successful** when there is a reconciliation between the two parts_.
+Protests are an important part of society change. In this time we are going to explore data from **The Mass Mobilization Project** which contains information about protests against governments, and contains a variety of variables such as location, dates and number of participants. The data is available in the [Mass Protest Data](https://github.com/datacamp/careerhub-data/tree/master/Mass%20Protest%20Data) Data Camp Github folder.
+
+The goal of this project is to define what characteristics share successful protests worldwide. The first step to achieve that it is to define what do I mean with **successful**. As most the protests demand state actions _I consider that a **protest is successful** when there is a reconciliation between the two parts_.
+
+<img src="Protesting-Sign.jpg" alt="Source: https://www.ucf.edu/news/7-influential-protests-in-american-history/" class="center">
 
 To make that possible we will apply the next skills during the process:
 
 - **Functional programming** with *R*
 - **Data manipulation** with *data.table*, *lubridate* and *stringr*
 - **Text mining** with *tidytext*
-- **Data visualization** with *ggplot2*, *scales* and *forcats*
+- **Data visualization** with *ggplot2*, *scales*, *forcats* and *patchwork*
 - **Network visualization** with *igraph* and *ggraph*
 - **Automated reporting** with *quarto*, *flextable*, *html* and *css*
 
+The [source code](https://github.com/AngelFelizR/myblog/tree/main/projs/mass-protest-data) of this project is available on Github.
 
 # Enveroment set-up
 
@@ -51,12 +59,22 @@ Before starting to find insights from data it's needed to load in R the function
 
 ## Libraries importantion
 
-This first step of the process is to install and load all the libraries to avoid writing the function with the sintax `PackageName::FunctionName()` if we are going to use many functions of a library.
+Libraries are very useful, but they can change over time making that the code used today might not work tomorrow. So, the first step before loading the libraries is to save a file (*renv.lock*) with all R package dependencies and the next code line we validate if we are tuning the project using the same version of package.
 
-```{r libraries-importation}
+```{r package-version-check}
+
+#| echo: false
+#| include: false
+
 if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
 renv::restore()
-          
+
+```
+
+Now we can load the libraries to use. To avoid unnecessary conflict if we just need a function from a library we copy the function in the global environment by using the syntax `PackageName::FunctionName`.
+
+```{r libraries-importation}
+
 library(data.table)
 library(lubridate)
 library(stringr)
@@ -73,19 +91,20 @@ library(tidytext)
 
 glimpse <- pillar::glimpse
 codelist_panel <- countrycode::codelist_panel
-
+correlation <- correlation::correlation
+here <- here::here
 ```
 
 
 ## Custom functions
 
-Open-source package are very powerful as they provide general purpose functions, but it's also useful to have some custom functions to perform repetitive task and improve code readability. During this project, we will use the following functions group it purpose:
+Open-source packages are very powerful as they provide general purpose functions, but it's also useful to have some custom project functions to perform repetitive task and improve code readability. During this project, we will use the following functions group it purpose:
 
 ### Styling
 
 - **custom_theme:** Defines the style of all ggplots across the project.
 
-```{r}
+```{r default-gg-theme}
 CustomTheme <-
 theme_light()+
   theme(axis.text = element_text(size = 15),
@@ -121,18 +140,20 @@ style_table <- function(DF){
 
 - **lower_clean_name:** Lower the case all words in a vector and remove any character that isn't a word.
 
-```{r}
+```{r text-cleanning-function}
+
 lower_clean_name <- function(text){
   
   str_to_lower(text) |>
     str_replace_all("[^A-Za-z ']"," ") |> 
     str_squish()
 }
+
 ```
 
 - **clean_amount:** Transforms a character vector with number and commas into a double one.
 
-```{r}
+```{r amount-cleanning-function}
 
 clean_amount <- \(x) gsub(",","",x) |> as.double()
 
@@ -142,7 +163,7 @@ clean_amount <- \(x) gsub(",","",x) |> as.double()
 
 - **find_string_approximation:** This function merges two data.tables to generate all possible combinations between them and select for each id the match that minimize the string distance between words of both tables. This function was inspired by the `reclin2` package as both follow simular steps.
 
-```{r}
+```{r string-approximation-function}
 
 find_string_approximation <- function(DT1,
                                       DT2,
@@ -170,7 +191,7 @@ find_string_approximation <- function(DT1,
 
 - **plot_word_found_distribution:** Creates a plot to show how the found words are distributed acording the number of words that have the `word.count.var`.
 
-```{r}
+```{r word-distribution-function}
 
 plot_word_found_distribution <- function(DT,
                                          word.count.var,
@@ -212,10 +233,11 @@ In this section we will take the data available and load it into R as `data.tabl
 
 **ProtestRaw** will be the main reference to use during the analysis. Any other imported data during this project will be used to extend or clean the information given in this data.
 
-```{r data-importation}
+```{r main-data-importation}
 
 ProtestRaw <-
-  fread("Raw-data/protest_data.csv", na.strings = "", integer64 = "double")
+  fread(here("Raw-data/protest_data.csv"), 
+        na.strings = "", integer64 = "double")
 
 glimpse(ProtestRaw)
 
@@ -225,12 +247,12 @@ glimpse(ProtestRaw)
 
 Let's import complementary data to make sense, clean and expand the information provided in `ProtestRaw`.
 
-- **WorldCities:** It has information about 239 countries and their cities. It will be used to clean the `location` field in the main data.
+- **WorldCities:** It has information about 239 countries and their cities. It will be used to clean the `location` field in the main data. The data can be found in [Simple Maps](https://simplemaps.com/data/world-cities) as a free database.
 
-```{r scrap-country-cities}
+```{r country-cities-data}
 
 WorldCities <-
-  fread("Raw-data/worldcities.csv", na.strings = "", sep=",",
+  fread(here("Raw-data/worldcities.csv"), na.strings = "", sep=",",
         select = c("country","city_ascii","capital","population")
   )[order(country,-population)
     
@@ -257,9 +279,9 @@ glimpse(WorldCities)
 
 ```
 
-- **CountryCode:** It has information of country codes from many institutions and we will use it to find out the `ccode` origin.
+- **CountryCode:** It has information of country codes from many institutions and we will use it to find out the `ccode` origin. It comes from the [countrycode](https://github.com/vincentarelbundock/countrycode) R package in the version 1.4.1.
 
-```{r country-codes}
+```{r country-codes-data}
 
 CountryCode <-
   codelist_panel |>
@@ -278,19 +300,20 @@ glimpse(CountryCode)
 
 ```
 
-- **Polity5:** Has some indicators to describe how state structures have been changing overtime.
+- **Polity5:** Has some indicators to describe how state structures have been changing overtime. According with 
 
   1. **DEMOC**: Goes from 0 to 10 to measure ***democracy*** level in a country in a specific time.
   2. **AUTOC**: Goes from 0 to 10 to measure ***autocracy*** level in a country in a specific time.
   3. **POLITY**: Results from the operation of subtracting AUTOC from DEMOC measure, to provide a single regime score that ranges from +10 (full democracy) to -10 (full autocracy).
   4. **DURABLE**: Saves the number of years since the last substantive change in authority characteristics (defined as a 3-point change in the POLITY score).
 
+This data comes from the [Polity5 Annual Time-Series, 1946-2018](https://www.systemicpeace.org/inscrdata.html) Excel report.
 
-```{r polity5-indicators}
+```{r polity5-indicators-data}
 
 Polity5 <-
   
-  fread("Raw-data/Polity5.csv", na.strings = "",
+  fread(here("Raw-data/Polity5.csv"), na.strings = "",
         select = c("ccode" = "integer",
                    "year" = "integer",
                    "democ" = "double",
@@ -427,9 +450,10 @@ Great, now we can use `CountryCodeConsolidated` to identify which code source ma
 ```{r}
 
 CountryCodeConsolidated[, melt(.SD, id.vars = c("country.name.en","ccode"),
-                         variable.name = "Country Code Source", value.name = "possible_code",
-                         variable.factor = FALSE, na.rm = TRUE),
-                  .SDcols = !patterns("^(year|country\\.name\\.en\\.regex)$")
+                               variable.name = "Country Code Source", 
+                               value.name = "possible_code",
+                               variable.factor = FALSE, na.rm = TRUE),
+                        .SDcols = !patterns("^(year|country\\.name\\.en\\.regex)$")
 ][, unique(.SD)
 ][, .(`% Found` = mean(ccode == possible_code, na.rm = TRUE) |> percent(accuracy = 0.01),
       `Number of Countries` = uniqueN(country.name.en)),
@@ -615,7 +639,7 @@ ProtestRaw[sources %like% "\\w",
 
 It is important to know that the data has ***`r nrow(ProtestRaw) |> comma()` rows***, but not all rows represent a protest, ***`r  ProtestRaw[protest == 0] |> nrow() |> comma()` rows*** of the data represent years where the wasn't any protest in a particular country. Let's see how is the missing value distribution in each case.
 
-```{r , fig.dim = c(14,10)}
+```{r missing-data-plot, fig.dim = c(14,10)}
 
 ProtestRaw[, lapply(.SD, function(x) x |> is.na() |> mean()),
     by = .(protest = fifelse(protest>0,"Protest","No Protest"))
@@ -645,7 +669,7 @@ After checking the data feature by feature we got a better sense of the data and
 
 In this section we will apply simplest cleaning steps at once.
 
-```{r}
+```{r simple-cleanning}
 
 ProtestSimpleClean <-
   
@@ -781,7 +805,7 @@ ProtestReshaped <-
                               variable.factor = FALSE)
   ][actions %like% "\\w"
   ][,`:=`(variable = fifelse(variable %like% "^protesterdemand", 
-                             "demand","response"),
+                             "dem","res"),
           actions = fifelse(actions == "accomodation",
                             "accommodation",actions),
           action_occur = TRUE)
@@ -797,8 +821,8 @@ ProtestReshaped <-
   ][, .SD, 
     .SDcols = !patterns("^(protesterdemand|stateresponse)")
   ][,{ 
-    ColsToFill <- str_subset(names(.SD),"^(demand|response)")
-    copy(.SD)[is.na(response_shootings), (ColsToFill) := FALSE]
+    ColsToFill <- str_subset(names(.SD),"^(dem|res)")
+    copy(.SD)[is.na(res_shootings), (ColsToFill) := FALSE]
   }][, protesterviolence := protesterviolence == 1]
 
 ```
@@ -806,7 +830,7 @@ ProtestReshaped <-
 After applying those changes we can see that currently all the columns have less
 than 5% of missing values.
 
-```{r}
+```{r reshaped-missing-data-plot}
 
 ProtestReshaped[, lapply(.SD, function(x) mean(is.na(x)))
   ][, id := 1
@@ -829,7 +853,7 @@ ProtestReshaped[, lapply(.SD, function(x) mean(is.na(x)))
 
 As we already confirmed that the data is related to Center for Systemic Peace data adding the variables to the main data can be done in one line of code.
 
-```{r}
+```{r polity-joinning}
 
 ProtestPolitical <-
   Polity5[ProtestReshaped, on = c("ccode","year")]
@@ -882,7 +906,7 @@ After extracting all matching cities and checking if the location field identifi
 
 - Assuming the in many cases of `location_no_found` the remaining words just make reference to one city we can compare all the cities of each country and take the city that  minimize the LCS (longest common sub-string distance) measure from the `stringdist` package.
 
-```{r}
+```{r one-city-match}
 
 StringApproxCols <- 
   c("id", "country", "location", "location_no_found", "num_cities")
@@ -898,7 +922,7 @@ OneWorldCityApprox <-
 
 At the end, we could find `r uniqueN(OneWorldCityApprox$id)` protest cities. but that with that we can find cities if the field describes more than one city. To check that let's see the number of words distribution.
 
-```{r}
+```{r one-city-match-plot}
 
 plot_word_found_distribution(ProtestExactCityMatch,
                              word.count.var = "location_no_found",
@@ -913,7 +937,7 @@ plot_word_found_distribution(ProtestExactCityMatch,
 
 As we can see most of the cities found only have one of two words and only some few one have 3 or 4 words. It is all also important to check that rows with one word didn't find any city related so we can take those cases out as we won't any extra city related those cases.
 
-```{r}
+```{r several-city-match}
 
 ManyWorldCityApprox <-
   lapply(1:4, function(n_gram){
@@ -936,7 +960,7 @@ ManyWorldCityApprox <-
 
 In next chart we can see how we could find cities in very long text with more than 20 words by applying string distance approximation.
 
-```{r}
+```{r several-city-match-plot}
 
 plot_word_found_distribution(ProtestExactCityMatch,
                              word.count.var = "location_no_found",
@@ -952,7 +976,7 @@ plot_word_found_distribution(ProtestExactCityMatch,
 
 Now it's time to add the cities found to the main data.
 
-```{r}
+```{r city-match-results}
 
 ProtestLocationExtracted <-
   list(OneWorldCityApprox[, c("id","country","city_ascii")],
@@ -983,7 +1007,7 @@ ProtestLocationExtracted <-
 
 After applying many transformations to the data we are ready to explore it. The new data it is tidy format and we will easy to manipulate across the exploration process.
 
-```{r}
+```{r showing-results}
 
 glimpse(ProtestLocationExtracted)
 
@@ -992,143 +1016,145 @@ glimpse(ProtestLocationExtracted)
 
 # Data exploration
 
-
-## Correlation network summary
-
 A we can see the data have some numeric and logical variables that can be converted to numeric. It would be really interesting if we can confirm which variables go in same or opposite directions. To find out that we can use the `correlation` function from the **correlation** which also give us confident intervals to confirm that the correlation are statistician significance.
 
-The first step it's to take out variables that don't bring big insights and case of finding any relation, then we select logical and numeric variables and calculate correlations.
+## Exploring numeric correlations
 
-```{r}
+The first step it's to take out variables that don't bring big insights and case of finding any relation, then we select logical and numeric variables and calculate correlations for all numeric and logical variables.
+
+```{r getting-correlation}
 
 CorSummary <-
   ProtestLocationExtracted[, !c("id","ccode","democ","autoc", "durable")
   ][, participants_category := as.integer(participants_category)
   ][, lapply(.SD, \(x) x * 1),
     .SDcols = \(x) is.logical(x) | is.numeric(x)] |> 
-  correlation::correlation() |>
+  correlation() |>
   as.data.table()
 
 CorSummary[1:6,
-           lapply(.SD, \(x) if(is.numeric(x)){round(x,2)}else{x})] |>
+           lapply(.SD, \(x) if(is.numeric(x)){round(x,2)}else{x}),
+           .SDcols = !patterns("^(t|df_error)$")] |>
   style_table()
 
 ```
 
+As we have many significant correlations, let's center our attention in higher significan ones
 
+```{r correlation-network}
 
-```{r}
-
-set.seed(50) 
-CorSummary[p < 0.05 & r >= 0.10
-][, cor_category := cut(r,0:5*2/10)] |>
-graph_from_data_frame(directed = FALSE) |>
-  ggraph(layout = "with_graphopt")+
-  geom_edge_link(aes(edge_color = cor_category), 
+set.seed(110)
+CorSummary[p < 0.05 & abs(r) >= 0.10] |>
+  graph_from_data_frame(directed = FALSE) |>
+  ggraph(layout = "with_dh")+
+  geom_edge_link(aes(edge_color = r), 
                  edge_width = 1)+
   geom_node_point(size = 3)+
   geom_node_text(aes(label = name), repel = TRUE)+
-  scale_edge_color_brewer(palette = "PuBu")+
-  labs(title = "Positive significan correlations")+
-  theme(legend.position = "top",
-        legend.title = element_blank())
+  scale_edge_color_gradient2(low = "red", high = "blue")+
+  labs(title = "Correlation Network")
+             
 
 ```
 
-By checking the last report chart we can say:
+By checking the last graph, we can see some interesting relations:
 
-1. Violent state responses like beatings, arrests, crowd dispersal, shootings and killings are correlated with violence from the protester side.
-2. Removing politician is a reason that moves many people (`participants_category`) and most of the time takes place in the capital and other cities in the nation several times in a year (`protestnumber`) and happens usually in countries more democratic than autocratic (`polity`).
-3. Labor wage disputes have a national presence and usually take place in democratic (`polity`) countries.
-4. The most common response in democratic countries it's to ignore protests.
+1. If protesters present violence during the manifestation it is more probable that the state responds with shootings, killings, beatings and arrests in countries with low democracy (`polity`) other wise it's more common for states to ignore the protests and crowd dispersal is independent from polity levels.
+
+2. Labor wage disputes takes place nationally in democratic countries with a low change of sharing the protest purpose demanding police brutality reduction.
+
+3. Removal a politician usually takes place in the capital of countries with low polity with many participants several times a in a year.
+
+4. When a protest is demanding a political behavior it's weird to see that protesters want other demands.  
+
 
 Let's confirm those findings adding other charts to see with extra details of each relation.
 
 
-### Protester violence relations
+### Distribution
+
+- Adding Confident Intervals
+- Adding text to identify each side meaning
 
 ```{r}
 
-melt.data.table(ProtestLocationExtracted,
-                id.vars = c("id","protesterviolence"),
-                measure.vars = str_subset(names(ProtestLocationExtracted),"response"),
-                variable.name = "response",
-                variable.factor = FALSE,
-                value.name = "response_happen"
-  )[response_happen == TRUE, 
-    .(number_protest = uniqueN(id)),
-    by = c("protesterviolence","response")
-  ][, violence_pct := number_protest[protesterviolence]/sum(number_protest),
-    by = "response"
-  ][, response := fct_reorder(response, violence_pct, unique)] |>
-  ggplot(aes(number_protest, response, fill = protesterviolence))+
-  geom_col(position = position_fill(), alpha = 0.85)+
-  geom_vline(aes(xintercept = 0.5), size = 0.75)+
-  scale_x_continuous(labels = percent_format(accuracy = 1))+
-  scale_fill_manual(values = c("TRUE" = "brown2",
-                               "FALSE" = "dodgerblue3"))+
-  labs(title = "Proportion of protester violence\nby response category",
-       y = "", x = "Proportion of protests (%)",
-       fill = "Protester Violence")+
-  theme(legend.position = "top")
+ProtestLocationExtracted[!is.na(polity), 
+                         melt(.SD, id.vars = c("id","polity","protesterviolence"),
+                              value.name = "Happen",
+                              variable.name = "Response",na.rm = TRUE), 
+                         .SDcols = patterns("^(id|polity|protesterviolence)$|^res")
+][, .(occurrence_prop = mean(Happen)),
+  by = .(`Protester Violence` = protesterviolence,
+         Polity = fifelse(polity <= 4, "Low Democracy", "High Democracy"),
+         Response = sub("^res_","",Response) |> str_to_title())
+][, dcast(.SD, ... ~ Polity, value.var = "occurrence_prop")
+][, `occurrence_prop_high/low_democracy` := log2(`High Democracy`/`Low Democracy`)
+][, Response := fct_reorder(Response, `occurrence_prop_high/low_democracy`, sum)] |>
+  ggplot(aes(`occurrence_prop_high/low_democracy`, Response, color = `Protester Violence`))+
+  geom_point(size = 4)+
+  geom_vline(aes(xintercept = 0), size = 1)+
+  scale_x_continuous(breaks = breaks_width(0.5))+
+  scale_color_manual(values = c("FALSE" = "dodgerblue3", "TRUE" = "brown2"))+
+  labs(title = "State Response Exploration",
+       y = "State Response", 
+       x = "Log of Odds Ratio:\nResponse Occurrence Between High/Low Democratic Countries")+
+  theme(panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        legend.position = "top")
+  
 
 ```
 
 For example, when states response with killings the 75% percent of protests were violent.
 
 
-### Polity ingnore
+```{r accommodation-pct-polity-plot}
+#| echo: false
 
-```{r}
+### Polity ignore
 
-ProtestLocationExtracted[!is.na(polity),
-                         melt(.SD, 
-                              measure.vars = str_subset(names(ProtestLocationExtracted),
-                                                        "demand"),
-                              variable.name = "demands",
-                              variable.factor = FALSE,
-                              value.name = "happen")
-][happen == TRUE,
-  .(accommodation_pct = mean(response_accommodation),
-    n = uniqueN(id)),
-  by = .(#participants_category,
-         demands = sub("demand_","",demands),
-         polity = fcase(polity < quantile(polity,0.25), "<Q1",
-                        polity < quantile(polity,0.50), "[Q1-Q2)",
-                        polity < quantile(polity,0.75), "[Q2-Q3)",
-                        polity >= quantile(polity,0.75),">=Q3") |>
-           factor(levels = c("<Q1", "[Q1-Q2)", "[Q2-Q3)",">=Q3")))] |>
-  ggplot(aes(polity, demands, fill = accommodation_pct ))+
-  geom_tile()+
-  geom_text(aes(label = accommodation_pct |> 
-                        percent(accuracy = 0.01) |>
-                        paste0(" | ", n),
-                size = 7),
-            fontface = "bold")+
-  scale_fill_gradient(low = "white", high = "red")+
-  theme_classic()+
-  theme(axis.text = element_text(size = 15),
-        axis.title = element_text(size = 16, face = "bold"),
-        strip.text = element_text(size = 16, face = "bold"),
-        plot.title = element_text(size = 25, face = "bold", 
-                                  hjust = 0.5, margin = margin(b = 15)),
-        legend.position = "none")
+
+# ProtestLocationExtracted[!is.na(polity),
+#                          melt(.SD, 
+#                               measure.vars = str_subset(names(ProtestLocationExtracted),
+#                                                         "demand"),
+#                               variable.name = "demands",
+#                               variable.factor = FALSE,
+#                               value.name = "happen")
+# ][happen == TRUE,
+#   .(accommodation_pct = mean(response_accommodation),
+#     n = uniqueN(id)),
+#   by = .(participants_category,
+#          demands = sub("demand_","",demands),
+#          polity = fcase(polity < quantile(polity,0.25), "<Q1",
+#                         polity < quantile(polity,0.50), "[Q1-Q2)",
+#                         polity < quantile(polity,0.75), "[Q2-Q3)",
+#                         polity >= quantile(polity,0.75),">=Q3") |>
+#            factor(levels = c("<Q1", "[Q1-Q2)", "[Q2-Q3)",">=Q3")))] |>
+#   ggplot(aes(polity, demands, fill = accommodation_pct ))+
+#   geom_tile()+
+#   geom_text(aes(label = accommodation_pct |> 
+#                         percent(accuracy = 0.01) |>
+#                         paste0(" | ", n),
+#                 size = 7),
+#             fontface = "bold")+
+#   scale_fill_gradient(low = "white", high = "red")+
+#   theme_classic()+
+#   theme(axis.text = element_text(size = 15),
+#         axis.title = element_text(size = 16, face = "bold"),
+#         strip.text = element_text(size = 16, face = "bold"),
+#         plot.title = element_text(size = 25, face = "bold", 
+#                                   hjust = 0.5, margin = margin(b = 15)),
+#         legend.position = "none")
 
 
 ```
 
 
-
-
 Arel-Bundock, Vincent, Nils Enevoldsen, and CJ Yetman, (2018). countrycode: An R package to convert country names and country codes. Journal of Open Source Software, 3(28), 848, https://doi.org/10.21105/joss.00848
 
-https://www.systemicpeace.org/inscrdata.html
-
-Center for Systemic Peace
+https://www.systemicpeace.org/inscrdata.html (Center for Systemic Peace)
 
 https://simplemaps.com/data/world-cities
 
-https://www.bragitoff.com/2016/03/english-dictionary-in-csv-format/
-
-https://www.mso.anu.edu.au/~ralph/OPTED/
 
