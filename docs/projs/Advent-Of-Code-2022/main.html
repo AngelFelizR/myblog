@@ -4004,12 +4004,17 @@ vertical-align: -.125em;
     <a class="nav-link" href="../../about.html">Blog</a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/"><i class="bi bi-github" role="img">
+    <a class="nav-link" href="https://github.com/AngelFelizR/"><i class="bi bi-github" role="img">
 </i> 
  </a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="https://twitter.com"><i class="bi bi-twitter" role="img">
+    <a class="nav-link" href="https://twitter.com/angel_feliz_f"><i class="bi bi-twitter" role="img">
+</i> 
+ </a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://do.linkedin.com/in/angel-esteban-feliz-ferreras"><i class="bi bi-linkedin" role="img">
 </i> 
  </a>
   </li>  
@@ -4061,6 +4066,11 @@ vertical-align: -.125em;
   <ul class="collapse">
   <li><a href="#part-1" id="toc-part-1" class="nav-link" data-scroll-target="#part-1"><span class="toc-section-number">1.1</span>  Part 1</a></li>
   <li><a href="#part-2" id="toc-part-2" class="nav-link" data-scroll-target="#part-2"><span class="toc-section-number">1.2</span>  Part 2</a></li>
+  </ul></li>
+  <li><a href="#day-2-rock-paper-scissors" id="toc-day-2-rock-paper-scissors" class="nav-link" data-scroll-target="#day-2-rock-paper-scissors"><span class="toc-section-number">2</span>  Day 2: Rock Paper Scissors</a>
+  <ul class="collapse">
+  <li><a href="#part-1-1" id="toc-part-1-1" class="nav-link" data-scroll-target="#part-1-1"><span class="toc-section-number">2.1</span>  Part 1</a></li>
+  <li><a href="#part-2-1" id="toc-part-2-1" class="nav-link" data-scroll-target="#part-2-1"><span class="toc-section-number">2.2</span>  Part 2</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -4126,6 +4136,73 @@ width: 50%;
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>][, <span class="fu">sum</span>(total_calories)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 210367</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="day-2-rock-paper-scissors" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Day 2: Rock Paper Scissors</h1>
+<section id="part-1-1" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="part-1-1"><span class="header-section-number">2.1</span> Part 1</h2>
+<p>Appreciative of your help yesterday, one Elf gives you an encrypted strategy guide (your puzzle input) that they say will be sure to help you win. “The first column is what your opponent is going to play: A for Rock, B for Paper, and C for Scissors. The second column–” Suddenly, the Elf is called away to help with someone’s tent.</p>
+<p>The second column, you reason, must be what you should play in response: X for Rock, Y for Paper, and Z for Scissors. Winning every time would be suspicious, so the responses must have been carefully chosen.</p>
+<p>The winner of the whole tournament is the player with the highest score. Your total score is the sum of your scores for each round. The score for a single round is the score for the shape you selected (1 for Rock, 2 for Paper, and 3 for Scissors) plus the score for the outcome of the round (0 if you lost, 3 if the round was a draw, and 6 if you won).</p>
+<p>What would your total score be if everything goes exactly according to your strategy guide?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>DecryptScore <span class="ot">&lt;-</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;Rock&quot;</span> <span class="ot">=</span> <span class="dv">1</span>, <span class="st">&quot;Paper&quot;</span> <span class="ot">=</span> <span class="dv">2</span> , <span class="st">&quot;Scissors&quot;</span> <span class="ot">=</span> <span class="dv">3</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>Win <span class="ot">&lt;-</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;Scissors&quot;</span> <span class="ot">=</span> <span class="st">&quot;Rock&quot;</span>, <span class="st">&quot;Rock&quot;</span> <span class="ot">=</span> <span class="st">&quot;Paper&quot;</span>, <span class="st">&quot;Paper&quot;</span> <span class="ot">=</span> <span class="st">&quot;Scissors&quot;</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>DecryptCol1 <span class="ot">&lt;-</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;A&quot;</span> <span class="ot">=</span> <span class="st">&quot;Rock&quot;</span>,  <span class="st">&quot;B&quot;</span> <span class="ot">=</span> <span class="st">&quot;Paper&quot;</span>, <span class="st">&quot;C&quot;</span> <span class="ot">=</span> <span class="st">&quot;Scissors&quot;</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>DecryptCol2 <span class="ot">&lt;-</span> </span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">&quot;X&quot;</span> <span class="ot">=</span> <span class="st">&quot;Rock&quot;</span>, <span class="st">&quot;Y&quot;</span> <span class="ot">=</span> <span class="st">&quot;Paper&quot;</span>, <span class="st">&quot;Z&quot;</span> <span class="ot">=</span> <span class="st">&quot;Scissors&quot;</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>EncryptedGuide <span class="ot">&lt;-</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="fu">data.table</span>(<span class="at">guide =</span> <span class="fu">readLines</span>(<span class="fu">here</span>(<span class="st">&quot;raw-data&quot;</span>,<span class="st">&quot;02-input.txt&quot;</span>))</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  )[, <span class="fu">c</span>(<span class="st">&quot;col1&quot;</span>, <span class="st">&quot;col2&quot;</span>) <span class="sc">:</span><span class="er">=</span> <span class="fu">tstrsplit</span>(guide, <span class="st">&quot; &quot;</span>)]</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>MyScores <span class="ot">&lt;-</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">CJ</span>(<span class="at">col1 =</span> DecryptCol1,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>     <span class="at">col2 =</span> DecryptCol1</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  )[, col2_score <span class="sc">:</span><span class="er">=</span> DecryptScore[col2]</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  ][col1 <span class="sc">==</span> col2,</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    col2_score <span class="sc">:</span><span class="er">=</span> col2_score <span class="sc">+</span> <span class="dv">3</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  ][Win[col1] <span class="sc">==</span> col2,</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    col2_score <span class="sc">:</span><span class="er">=</span> col2_score <span class="sc">+</span> <span class="dv">6</span>]</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="fu">copy</span>(EncryptedGuide)[, <span class="st">`</span><span class="at">:=</span><span class="st">`</span>(<span class="at">col1 =</span> DecryptCol1[col1],</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>                            <span class="at">col2 =</span> DecryptCol2[col2])</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>][MyScores, on <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;col1&quot;</span>,<span class="st">&quot;col2&quot;</span>), nomatch <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>][, <span class="fu">sum</span>(col2_score)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 13005</code></pre>
+</div>
+</div>
+</section>
+<section id="part-2-1" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="part-2-1"><span class="header-section-number">2.2</span> Part 2</h2>
+<p>The Elf finishes helping with the tent and sneaks back over to you. “Anyway, the second column says how the round needs to end: X means you need to lose, Y means you need to end the round in a draw, and Z means you need to win. Good luck!”</p>
+<p>Following the Elf’s instructions for the second column, what would your total score be if everything goes exactly according to your strategy guide?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>Lose <span class="ot">&lt;-</span> <span class="fu">names</span>(Win)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(Lose) <span class="ot">&lt;-</span> Win</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">copy</span>(EncryptedGuide)[, <span class="st">`</span><span class="at">:=</span><span class="st">`</span>(<span class="at">col1 =</span> DecryptCol1[col1],</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">col2 =</span> <span class="fu">fcase</span>(col2 <span class="sc">==</span> <span class="st">&quot;X&quot;</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                                         Lose[DecryptCol1[col1]],</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                                         col2 <span class="sc">==</span> <span class="st">&quot;Y&quot;</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                                         DecryptCol1[col1],</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                                         col2 <span class="sc">==</span> <span class="st">&quot;Z&quot;</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                                         Win[DecryptCol1[col1]]))</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                     </span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>][MyScores, on <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;col1&quot;</span>,<span class="st">&quot;col2&quot;</span>), nomatch <span class="ot">=</span> <span class="dv">0</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>][, <span class="fu">sum</span>(col2_score)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11373</code></pre>
 </div>
 </div>
 

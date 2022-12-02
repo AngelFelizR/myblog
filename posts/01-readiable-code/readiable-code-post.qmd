@@ -1,5 +1,32 @@
 ---
-title: "The Art of Readiable R code"
+title: "The Art of Readiable R Code"
 author: "Angel Feliz"
+date: "1 December 2022"
 editor: source
+execute:
+  echo: true
+  message: false
+  warning: false
+format: 
+  html:
+    fig-width: 12
+    fig-height: 8
+    fig-align: "center"
+    toc: true
+    toc-title: Index
+    toc-location: left
+    self-contained: true
+    number-sections: true
+    smooth-scroll: true
+image: "readable-code-book.jpg"
 ---
+
+# Introduction {.unnumbered}
+
+Code readability it's odd topic in most of online courses, as it isn't the main problem we start to  problem, but when we start making more complex scripts code readability becomes a must if we need to maintain and improve the a code in the log term.
+
+[**The Art of Readable Code**](https://www.amazon.com/Art-Readable-Code-Practical-Techniques/dp/0596802293) by Dustin Boswell and Trevor Foucher it really good reference to learn how to write code in a consistent way. In this post I will share what I learnt by translating their advices to R code.
+
+# 
+
+
