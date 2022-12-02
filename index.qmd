@@ -18,6 +18,6 @@ about:
 
 Senior Reporting Analyst with 2 years’ experience using R to process and create business reports in formats as Excel, Word, Power Point, and html. 
 
-Proven experience integrating ad hoc regular expressions to transform, extract and validate text in data pipelines to find abnormalities and automate repetitive tasks; improving reporting accuracy, reducing waiting times and opening new possibilities to empower decision makers. 
+Proven experience integrating ad hoc regular expressions to transform, extract and validate text data in data pipelines to find abnormalities and automate repetitive tasks; improving reporting accuracy, reducing waiting times and opening new possibilities to empower decision makers. 
 
 Autodidactic, self-motivated, inquisitive, and eager to apply data science techniques to create business value and increase ROI for your company
