@@ -15,7 +15,7 @@ format:
     toc-title: Index
     toc-location: left
     self-contained: true
-    number-sections: true
+    number-sections: false
     smooth-scroll: true
 image: "advent-of-code.jpg"
 categories: [Challenge]
@@ -52,6 +52,9 @@ library(data.table)
 
 here <- here::here
 ```
+
+
+::: {.panel-tabset}
 
 # Day 1: Calories Counting 
 
@@ -97,10 +100,17 @@ data.table(Elf = cumsum(!calories %like% "\\d")+1,
 
 ```
 
-<<<<<<< HEAD
-=======
 
 # Day 2: Rock Paper Scissors
+
+```{r}
+
+EncryptedGuide <-
+data.table(guide = readLines(here("raw-data","02-input.txt"))
+  )[, c("col1", "col2") := tstrsplit(guide, " ")]
+
+```
+
 
 ## Part 1
 
@@ -126,9 +136,6 @@ DecryptCol1 <-
 DecryptCol2 <- 
   c("X" = "Rock", "Y" = "Paper", "Z" = "Scissors")
 
-EncryptedGuide <-
-data.table(guide = readLines(here("raw-data","02-input.txt"))
-  )[, c("col1", "col2") := tstrsplit(guide, " ")]
 
 MyScores <-
   CJ(col1 = DecryptCol1,
@@ -138,6 +145,7 @@ MyScores <-
     col2_score := col2_score + 3
   ][Win[col1] == col2,
     col2_score := col2_score + 6]
+
 
 copy(EncryptedGuide)[, `:=`(col1 = DecryptCol1[col1],
                             col2 = DecryptCol2[col2])
@@ -172,4 +180,158 @@ copy(EncryptedGuide)[, `:=`(col1 = DecryptCol1[col1],
 ```
 
 
->>>>>>> dev
+# Day 3: Rucksack Reorganization
+
+```{r}
+RucksackItems <-
+data.table(items = readLines(here("raw-data","03-input.txt")))
+
+```
+
+## Part 1
+
+Each rucksack has two large compartments. All items of a given type are meant to go into exactly one of the two compartments. The Elf that did the packing failed to follow this rule for exactly one item type per rucksack.
+
+Every item type can be converted to a priority:
+
+Lowercase item types a through z have priorities 1 through 26.
+Uppercase item types A through Z have priorities 27 through 52.
+
+Find the item type that appears in both compartments of each rucksack. What is the sum of the priorities of those item types?
+
+```{r}
+
+RucksackItems[, .(id = .I,
+                  sack1 = substr(items, 1, nchar(items)/2) ,
+                  sack2 = substr(items, nchar(items)/2 +1, nchar(items)) )
+][, .(sack1 = strsplit(sack1,""),
+      sack2 = strsplit(sack2,"")),
+  by = "id"
+][, merge(copy(.SD)[, .(sack1 = sack1[[1]]), "id"],
+          copy(.SD)[, .(sack2 = sack2[[1]]), "id"],
+          by = "id", allow.cartesian=TRUE)
+][sack1 == sack2,
+  unique(.SD)
+][, priority := which(sack1 == c(letters,LETTERS)),
+  by = "id"
+][, sum(priority)]
+
+```
+
+## Part 2
+
+For safety, the Elves are divided into groups of three. Every Elf carries a badge that identifies their group. For efficiency, within each group of three Elves, the badge is the only item type carried by all three Elves. That is, if a group's badge is item type B, then all three Elves will have item type B somewhere in their rucksack, and at most two of the Elves will be carrying any other item type.
+
+Find the item type that corresponds to the badges of each three-Elf group. What is the sum of the priorities of those item types?
+
+```{r}
+
+RucksackItems[, .(id = .I,
+                  group = cumsum(.I %% 3 == 1),
+                  items = strsplit(items,"") )
+][, .(items = items[[1]]),
+  by = c("group","id")
+][, .(n_id = uniqueN(id)),
+  by = c("items","group")
+][n_id == 3
+][, priority := which(items == c(letters,LETTERS)),
+  by = "group"
+][, sum(priority)]
+
+
+```
+
+
+# Day 4
+
+## Part 1
+
+## Part 2
+
+# Day 5:???
+## Part 1
+## Part 2
+
+# Day 6:???
+## Part 1
+## Part 2
+
+# Day 7:???
+## Part 1
+## Part 2
+
+# Day 8:???
+## Part 1
+## Part 2
+
+# Day 9:???
+## Part 1
+## Part 2
+
+# Day 10:???
+## Part 1
+## Part 2
+
+# Day 11:???
+## Part 1
+## Part 2
+
+# Day 12:???
+## Part 1
+## Part 2
+
+# Day 13:???
+## Part 1
+## Part 2
+
+# Day 14:???
+## Part 1
+## Part 2
+ 
+# Day 15:???
+## Part 1
+## Part 2
+
+# Day 16:???
+## Part 1
+## Part 2
+
+# Day 17:???
+## Part 1
+## Part 2
+
+# Day 18:???
+## Part 1
+## Part 2
+
+# Day 19:???
+## Part 1
+## Part 2
+
+# Day 20:???
+## Part 1
+## Part 2
+
+# Day 21:???
+## Part 1
+## Part 2
+
+# Day 22:???
+## Part 1
+## Part 2
+
+# Day 23:???
+## Part 1
+## Part 2
+
+# Day 24:???
+## Part 1
+## Part 2
+
+# Day 25:???
+## Part 1
+## Part 2
+
+
+
+:::
