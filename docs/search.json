@@ -31,29 +31,351 @@
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-1",
     "href": "projs/Advent-Of-Code-2022/main.html#part-1",
     "title": "Advent Of Code 2022",
-    "section": "1.1 Part 1",
-    "text": "1.1 Part 1\nThe jungle must be too overgrown and difficult to navigate in vehicles or access from the air; the Elves’ expedition traditionally goes on foot. As your boats approach land, the Elves begin taking inventory of their supplies. One important consideration is food - in particular, the number of Calories each Elf is carrying (your puzzle input).\nIn case the Elves get hungry and need extra snacks, they need to know which Elf to ask: they’d like to know how many Calories are being carried by the Elf carrying the most Calories.\nFind the Elf carrying the most Calories. How many total Calories is that Elf carrying?\n\ndata.table(Elf = cumsum(!calories %like% \"\\\\d\")+1,\n           Calories = as.integer(calories)\n)[, .(total_calories = sum(Calories, na.rm = TRUE)),\n  by = \"Elf\"\n][, max(total_calories)]\n\n[1] 72478"
+    "section": "Part 1",
+    "text": "Part 1\nThe jungle must be too overgrown and difficult to navigate in vehicles or access from the air; the Elves’ expedition traditionally goes on foot. As your boats approach land, the Elves begin taking inventory of their supplies. One important consideration is food - in particular, the number of Calories each Elf is carrying (your puzzle input).\nIn case the Elves get hungry and need extra snacks, they need to know which Elf to ask: they’d like to know how many Calories are being carried by the Elf carrying the most Calories.\nFind the Elf carrying the most Calories. How many total Calories is that Elf carrying?\n\ndata.table(Elf = cumsum(!calories %like% \"\\\\d\")+1,\n           Calories = as.integer(calories)\n)[, .(total_calories = sum(Calories, na.rm = TRUE)),\n  by = \"Elf\"\n][, max(total_calories)]\n\n[1] 72478"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-2",
     "href": "projs/Advent-Of-Code-2022/main.html#part-2",
     "title": "Advent Of Code 2022",
-    "section": "1.2 Part 2",
-    "text": "1.2 Part 2\nBy the time you calculate the answer to the Elves’ question, they’ve already realized that the Elf carrying the most Calories of food might eventually run out of snacks.\nTo avoid this unacceptable situation, the Elves would instead like to know the total Calories carried by the top three Elves carrying the most Calories. That way, even if one of those Elves runs out of snacks, they still have two backups.\nFind the top three Elves carrying the most Calories. How many Calories are those Elves carrying in total?\n\ndata.table(Elf = cumsum(!calories %like% \"\\\\d\")+1,\n           Calories = as.integer(calories)\n)[, .(total_calories = sum(Calories, na.rm = TRUE)),\n  by = \"Elf\"\n][order(-total_calories),\n][1:3\n][, sum(total_calories)]\n\n[1] 210367"
+    "section": "Part 2",
+    "text": "Part 2\nBy the time you calculate the answer to the Elves’ question, they’ve already realized that the Elf carrying the most Calories of food might eventually run out of snacks.\nTo avoid this unacceptable situation, the Elves would instead like to know the total Calories carried by the top three Elves carrying the most Calories. That way, even if one of those Elves runs out of snacks, they still have two backups.\nFind the top three Elves carrying the most Calories. How many Calories are those Elves carrying in total?\n\ndata.table(Elf = cumsum(!calories %like% \"\\\\d\")+1,\n           Calories = as.integer(calories)\n)[, .(total_calories = sum(Calories, na.rm = TRUE)),\n  by = \"Elf\"\n][order(-total_calories),\n][1:3\n][, sum(total_calories)]\n\n[1] 210367"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-1",
     "href": "projs/Advent-Of-Code-2022/main.html#part-1-1",
     "title": "Advent Of Code 2022",
-    "section": "3.1 Part 1",
-    "text": "3.1 Part 1\nAppreciative of your help yesterday, one Elf gives you an encrypted strategy guide (your puzzle input) that they say will be sure to help you win. “The first column is what your opponent is going to play: A for Rock, B for Paper, and C for Scissors. The second column–” Suddenly, the Elf is called away to help with someone’s tent.\nThe second column, you reason, must be what you should play in response: X for Rock, Y for Paper, and Z for Scissors. Winning every time would be suspicious, so the responses must have been carefully chosen.\nThe winner of the whole tournament is the player with the highest score. Your total score is the sum of your scores for each round. The score for a single round is the score for the shape you selected (1 for Rock, 2 for Paper, and 3 for Scissors) plus the score for the outcome of the round (0 if you lost, 3 if the round was a draw, and 6 if you won).\nWhat would your total score be if everything goes exactly according to your strategy guide?\n\nDecryptScore <- \n  c(\"Rock\" = 1, \"Paper\" = 2 , \"Scissors\" = 3)\n\nWin <- \n  c(\"Scissors\" = \"Rock\", \"Rock\" = \"Paper\", \"Paper\" = \"Scissors\")\n\nDecryptCol1 <-\n  c(\"A\" = \"Rock\",  \"B\" = \"Paper\", \"C\" = \"Scissors\")\n\nDecryptCol2 <- \n  c(\"X\" = \"Rock\", \"Y\" = \"Paper\", \"Z\" = \"Scissors\")\n\nEncryptedGuide <-\ndata.table(guide = readLines(here(\"raw-data\",\"02-input.txt\"))\n  )[, c(\"col1\", \"col2\") := tstrsplit(guide, \" \")]\n\nMyScores <-\n  CJ(col1 = DecryptCol1,\n     col2 = DecryptCol1\n  )[, col2_score := DecryptScore[col2]\n  ][col1 == col2,\n    col2_score := col2_score + 3\n  ][Win[col1] == col2,\n    col2_score := col2_score + 6]\n\ncopy(EncryptedGuide)[, `:=`(col1 = DecryptCol1[col1],\n                            col2 = DecryptCol2[col2])\n][MyScores, on = c(\"col1\",\"col2\"), nomatch = 0\n][, sum(col2_score)]\n\n[1] 13005"
+    "section": "Part 1",
+    "text": "Part 1\nAppreciative of your help yesterday, one Elf gives you an encrypted strategy guide (your puzzle input) that they say will be sure to help you win. “The first column is what your opponent is going to play: A for Rock, B for Paper, and C for Scissors. The second column–” Suddenly, the Elf is called away to help with someone’s tent.\nThe second column, you reason, must be what you should play in response: X for Rock, Y for Paper, and Z for Scissors. Winning every time would be suspicious, so the responses must have been carefully chosen.\nThe winner of the whole tournament is the player with the highest score. Your total score is the sum of your scores for each round. The score for a single round is the score for the shape you selected (1 for Rock, 2 for Paper, and 3 for Scissors) plus the score for the outcome of the round (0 if you lost, 3 if the round was a draw, and 6 if you won).\nWhat would your total score be if everything goes exactly according to your strategy guide?\n\nDecryptScore <- \n  c(\"Rock\" = 1, \"Paper\" = 2 , \"Scissors\" = 3)\n\nWin <- \n  c(\"Scissors\" = \"Rock\", \"Rock\" = \"Paper\", \"Paper\" = \"Scissors\")\n\nDecryptCol1 <-\n  c(\"A\" = \"Rock\",  \"B\" = \"Paper\", \"C\" = \"Scissors\")\n\nDecryptCol2 <- \n  c(\"X\" = \"Rock\", \"Y\" = \"Paper\", \"Z\" = \"Scissors\")\n\n\nMyScores <-\n  CJ(col1 = DecryptCol1,\n     col2 = DecryptCol1\n  )[, col2_score := DecryptScore[col2]\n  ][col1 == col2,\n    col2_score := col2_score + 3\n  ][Win[col1] == col2,\n    col2_score := col2_score + 6]\n\n\ncopy(EncryptedGuide)[, `:=`(col1 = DecryptCol1[col1],\n                            col2 = DecryptCol2[col2])\n][MyScores, on = c(\"col1\",\"col2\"), nomatch = 0\n][, sum(col2_score)]\n\n[1] 13005"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-1",
     "href": "projs/Advent-Of-Code-2022/main.html#part-2-1",
     "title": "Advent Of Code 2022",
-    "section": "3.2 Part 2",
-    "text": "3.2 Part 2\nThe Elf finishes helping with the tent and sneaks back over to you. “Anyway, the second column says how the round needs to end: X means you need to lose, Y means you need to end the round in a draw, and Z means you need to win. Good luck!”\nFollowing the Elf’s instructions for the second column, what would your total score be if everything goes exactly according to your strategy guide?\n\nLose <- names(Win)\nnames(Lose) <- Win\n\ncopy(EncryptedGuide)[, `:=`(col1 = DecryptCol1[col1],\n                            col2 = fcase(col2 == \"X\",\n                                         Lose[DecryptCol1[col1]],\n                                         col2 == \"Y\",\n                                         DecryptCol1[col1],\n                                         col2 == \"Z\",\n                                         Win[DecryptCol1[col1]]))\n                     \n][MyScores, on = c(\"col1\",\"col2\"), nomatch = 0\n][, sum(col2_score)]\n\n[1] 11373\n\n\n\n\n\n\n\n\n\ndev"
+    "section": "Part 2",
+    "text": "Part 2\nThe Elf finishes helping with the tent and sneaks back over to you. “Anyway, the second column says how the round needs to end: X means you need to lose, Y means you need to end the round in a draw, and Z means you need to win. Good luck!”\nFollowing the Elf’s instructions for the second column, what would your total score be if everything goes exactly according to your strategy guide?\n\nLose <- names(Win)\nnames(Lose) <- Win\n\ncopy(EncryptedGuide)[, `:=`(col1 = DecryptCol1[col1],\n                            col2 = fcase(col2 == \"X\",\n                                         Lose[DecryptCol1[col1]],\n                                         col2 == \"Y\",\n                                         DecryptCol1[col1],\n                                         col2 == \"Z\",\n                                         Win[DecryptCol1[col1]]))\n                     \n][MyScores, on = c(\"col1\",\"col2\"), nomatch = 0\n][, sum(col2_score)]\n\n[1] 11373"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-2",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-2",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1\nEach rucksack has two large compartments. All items of a given type are meant to go into exactly one of the two compartments. The Elf that did the packing failed to follow this rule for exactly one item type per rucksack.\nEvery item type can be converted to a priority:\nLowercase item types a through z have priorities 1 through 26. Uppercase item types A through Z have priorities 27 through 52.\nFind the item type that appears in both compartments of each rucksack. What is the sum of the priorities of those item types?\n\nRucksackItems[, .(id = .I,\n                  sack1 = substr(items, 1, nchar(items)/2) ,\n                  sack2 = substr(items, nchar(items)/2 +1, nchar(items)) )\n][, .(sack1 = strsplit(sack1,\"\"),\n      sack2 = strsplit(sack2,\"\")),\n  by = \"id\"\n][, merge(copy(.SD)[, .(sack1 = sack1[[1]]), \"id\"],\n          copy(.SD)[, .(sack2 = sack2[[1]]), \"id\"],\n          by = \"id\", allow.cartesian=TRUE)\n][sack1 == sack2,\n  unique(.SD)\n][, priority := which(sack1 == c(letters,LETTERS)),\n  by = \"id\"\n][, sum(priority)]\n\n[1] 7878"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-2",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-2",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2\nFor safety, the Elves are divided into groups of three. Every Elf carries a badge that identifies their group. For efficiency, within each group of three Elves, the badge is the only item type carried by all three Elves. That is, if a group’s badge is item type B, then all three Elves will have item type B somewhere in their rucksack, and at most two of the Elves will be carrying any other item type.\nFind the item type that corresponds to the badges of each three-Elf group. What is the sum of the priorities of those item types?\n\nRucksackItems[, .(id = .I,\n                  group = cumsum(.I %% 3 == 1),\n                  items = strsplit(items,\"\") )\n][, .(items = items[[1]]),\n  by = c(\"group\",\"id\")\n][, .(n_id = uniqueN(id)),\n  by = c(\"items\",\"group\")\n][n_id == 3\n][, priority := which(items == c(letters,LETTERS)),\n  by = \"group\"\n][, sum(priority)]\n\n[1] 2760"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-3",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-3",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-3",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-3",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-4",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-4",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-4",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-4",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-5",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-5",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-5",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-5",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-6",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-6",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-6",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-6",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-7",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-7",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-7",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-7",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-8",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-8",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-8",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-8",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-9",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-9",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-9",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-9",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-10",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-10",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-10",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-10",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-11",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-11",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-11",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-11",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-12",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-12",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-12",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-12",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-13",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-13",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-13",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-13",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-14",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-14",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-14",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-14",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-15",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-15",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-15",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-15",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-16",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-16",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-16",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-16",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-17",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-17",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-17",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-17",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-18",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-18",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-18",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-18",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-19",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-19",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-19",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-19",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-20",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-20",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-20",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-20",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-21",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-21",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-21",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-21",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-22",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-22",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-22",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-22",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-23",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-23",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-23",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-23",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-24",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-1-24",
+    "title": "Advent Of Code 2022",
+    "section": "Part 1",
+    "text": "Part 1"
+  },
+  {
+    "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-24",
+    "href": "projs/Advent-Of-Code-2022/main.html#part-2-24",
+    "title": "Advent Of Code 2022",
+    "section": "Part 2",
+    "text": "Part 2"
   },
   {
     "objectID": "projs/mass-protest-data/main.html",
