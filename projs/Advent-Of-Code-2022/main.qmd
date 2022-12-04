@@ -242,11 +242,52 @@ RucksackItems[, .(id = .I,
 ```
 
 
-# Day 4
+# Day 4: Camp Cleanup
+
+```{r}
+CleanupPlan <- data.table(pair = readLines(here("raw-data/04-input.txt")))
+```
 
 ## Part 1
 
+Space needs to be cleared before the last supplies can be unloaded from the ships, and so several Elves have been assigned the job of cleaning up sections of the camp. Every section has a unique ID number, and each Elf is assigned a range of section IDs.
+
+However, as some of the Elves compare their section assignments with each other, they've noticed that many of the assignments overlap. To try to quickly find overlaps and reduce duplicated effort, the Elves pair up and make a big list of the section assignments for each pair (your puzzle input).
+
+In how many assignment pairs does one range fully contain the other?
+
+```{r}
+
+CleanupPlan[, c("range1_start","range1_end",
+                "range2_start","range2_end") := 
+         tstrsplit(pair, ",|-") |> lapply(as.integer)
+][ (range1_start >=  range2_start & range1_end <= range2_end) |
+   (range2_start >=  range1_start & range2_end <= range1_end),
+   .N]
+
+```
+
+
 ## Part 2
+
+It seems like there is still quite a bit of duplicate work planned. Instead, the Elves would like to know the number of pairs that overlap at all.
+
+In how many assignment pairs do the ranges overlap?
+
+```{r}
+
+CleanupPlan[, c("range1_start","range1_end",
+                "range2_start","range2_end") := 
+         tstrsplit(pair, ",|-") |> lapply(as.integer)
+][, n_intersect := 
+    intersect(range1_start:range1_end,
+              range2_start:range2_end) |>
+    length(),
+  by = .I
+][n_intersect > 0, .N]
+
+```
+
 
 # Day 5:???
 ## Part 1
