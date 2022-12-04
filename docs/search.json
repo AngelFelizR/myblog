@@ -74,14 +74,14 @@
     "href": "projs/Advent-Of-Code-2022/main.html#part-1-3",
     "title": "Advent Of Code 2022",
     "section": "Part 1",
-    "text": "Part 1"
+    "text": "Part 1\nSpace needs to be cleared before the last supplies can be unloaded from the ships, and so several Elves have been assigned the job of cleaning up sections of the camp. Every section has a unique ID number, and each Elf is assigned a range of section IDs.\nHowever, as some of the Elves compare their section assignments with each other, they’ve noticed that many of the assignments overlap. To try to quickly find overlaps and reduce duplicated effort, the Elves pair up and make a big list of the section assignments for each pair (your puzzle input).\nIn how many assignment pairs does one range fully contain the other?\n\nCleanupPlan[, c(\"range1_start\",\"range1_end\",\n                \"range2_start\",\"range2_end\") := \n         tstrsplit(pair, \",|-\") |> lapply(as.integer)\n][ (range1_start >=  range2_start & range1_end <= range2_end) |\n   (range2_start >=  range1_start & range2_end <= range1_end),\n   .N]\n\n[1] 511"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-3",
     "href": "projs/Advent-Of-Code-2022/main.html#part-2-3",
     "title": "Advent Of Code 2022",
     "section": "Part 2",
-    "text": "Part 2"
+    "text": "Part 2\nIt seems like there is still quite a bit of duplicate work planned. Instead, the Elves would like to know the number of pairs that overlap at all.\nIn how many assignment pairs do the ranges overlap?\n\nCleanupPlan[, c(\"range1_start\",\"range1_end\",\n                \"range2_start\",\"range2_end\") := \n         tstrsplit(pair, \",|-\") |> lapply(as.integer)\n][, n_intersect := \n    intersect(range1_start:range1_end,\n              range2_start:range2_end) |>\n    length(),\n  by = .I\n][n_intersect > 0, .N]\n\n[1] 821"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-4",
