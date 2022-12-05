@@ -49,6 +49,7 @@ Let's start loading package to use and having fun.
 
 ```{r}
 library(data.table)
+library(stringr)
 
 here <- here::here
 ```
@@ -64,11 +65,6 @@ calories <- readLines(here("raw-data","01-input.txt"))
 
 ## Part 1
 
-The jungle must be too overgrown and difficult to navigate in vehicles or access from the air; the Elves' expedition traditionally goes on foot. As your boats approach land, the Elves begin taking inventory of their supplies. One important consideration is food - in particular, the number of Calories each Elf is carrying (your puzzle input).
-
-In case the Elves get hungry and need extra snacks, they need to know which Elf to ask: they'd like to know how many Calories are being carried by the Elf carrying the most Calories.
-
-Find the Elf carrying the most Calories. How many total Calories is that Elf carrying?
 
 ```{r}
 
@@ -82,11 +78,6 @@ data.table(Elf = cumsum(!calories %like% "\\d")+1,
 
 ## Part 2
 
-By the time you calculate the answer to the Elves' question, they've already realized that the Elf carrying the most Calories of food might eventually run out of snacks.
-
-To avoid this unacceptable situation, the Elves would instead like to know the total Calories carried by the top three Elves carrying the most Calories. That way, even if one of those Elves runs out of snacks, they still have two backups.
-
-Find the top three Elves carrying the most Calories. How many Calories are those Elves carrying in total?
 
 ```{r}
 
@@ -114,13 +105,6 @@ data.table(guide = readLines(here("raw-data","02-input.txt"))
 
 ## Part 1
 
-Appreciative of your help yesterday, one Elf gives you an encrypted strategy guide (your puzzle input) that they say will be sure to help you win. "The first column is what your opponent is going to play: A for Rock, B for Paper, and C for Scissors. The second column--" Suddenly, the Elf is called away to help with someone's tent.
-
-The second column, you reason, must be what you should play in response: X for Rock, Y for Paper, and Z for Scissors. Winning every time would be suspicious, so the responses must have been carefully chosen.
-
-The winner of the whole tournament is the player with the highest score. Your total score is the sum of your scores for each round. The score for a single round is the score for the shape you selected (1 for Rock, 2 for Paper, and 3 for Scissors) plus the score for the outcome of the round (0 if you lost, 3 if the round was a draw, and 6 if you won).
-
-What would your total score be if everything goes exactly according to your strategy guide?
 
 ```{r}
 
@@ -157,10 +141,6 @@ copy(EncryptedGuide)[, `:=`(col1 = DecryptCol1[col1],
 
 ## Part 2
 
-The Elf finishes helping with the tent and sneaks back over to you. "Anyway, the second column says how the round needs to end: X means you need to lose, Y means you need to end the round in a draw, and Z means you need to win. Good luck!"
-
-Following the Elf's instructions for the second column, what would your total score be if everything goes exactly according to your strategy guide?
-
 ```{r}
 
 Lose <- names(Win)
@@ -190,14 +170,6 @@ data.table(items = readLines(here("raw-data","03-input.txt")))
 
 ## Part 1
 
-Each rucksack has two large compartments. All items of a given type are meant to go into exactly one of the two compartments. The Elf that did the packing failed to follow this rule for exactly one item type per rucksack.
-
-Every item type can be converted to a priority:
-
-Lowercase item types a through z have priorities 1 through 26.
-Uppercase item types A through Z have priorities 27 through 52.
-
-Find the item type that appears in both compartments of each rucksack. What is the sum of the priorities of those item types?
 
 ```{r}
 
@@ -220,9 +192,6 @@ RucksackItems[, .(id = .I,
 
 ## Part 2
 
-For safety, the Elves are divided into groups of three. Every Elf carries a badge that identifies their group. For efficiency, within each group of three Elves, the badge is the only item type carried by all three Elves. That is, if a group's badge is item type B, then all three Elves will have item type B somewhere in their rucksack, and at most two of the Elves will be carrying any other item type.
-
-Find the item type that corresponds to the badges of each three-Elf group. What is the sum of the priorities of those item types?
 
 ```{r}
 
@@ -250,11 +219,6 @@ CleanupPlan <- data.table(pair = readLines(here("raw-data/04-input.txt")))
 
 ## Part 1
 
-Space needs to be cleared before the last supplies can be unloaded from the ships, and so several Elves have been assigned the job of cleaning up sections of the camp. Every section has a unique ID number, and each Elf is assigned a range of section IDs.
-
-However, as some of the Elves compare their section assignments with each other, they've noticed that many of the assignments overlap. To try to quickly find overlaps and reduce duplicated effort, the Elves pair up and make a big list of the section assignments for each pair (your puzzle input).
-
-In how many assignment pairs does one range fully contain the other?
 
 ```{r}
 
@@ -270,9 +234,6 @@ CleanupPlan[, c("range1_start","range1_end",
 
 ## Part 2
 
-It seems like there is still quite a bit of duplicate work planned. Instead, the Elves would like to know the number of pairs that overlap at all.
-
-In how many assignment pairs do the ranges overlap?
 
 ```{r}
 
@@ -289,9 +250,99 @@ CleanupPlan[, c("range1_start","range1_end",
 ```
 
 
-# Day 5:???
+# Day 5: Supply Stacks
+
+```{r}
+
+Stacks <- 
+  data.table(data = readLines(here("raw-data/05-input.txt")))
+
+
+Movements <- 
+  Stacks[data %like% "^move"
+  ][, c("n_items","from","to") := 
+      str_match(data,"move (\\d+) from (\\d+) to (\\d+)")[,-1] |>
+      as.data.table()
+  ][, !c("data")
+  ][, c("n_items","from","to") := .(as.integer(n_items), 
+                                    paste0("stack", from),
+                                    paste0("stack", to))]
+
+
+StartingStacks <- 
+  Stacks[!data %like% "^move",
+         head(.SD, .N-1)
+  ][,{
+    
+    cols <-
+      tail(.SD, 1
+      )[, str_count(data,"\\d+")] |>
+      seq.int(from = 1, by = 1) |>
+      paste0("stack", num = _)
+    
+    
+    .SD[, head(.SD,.N-1)
+    ][, (cols) := lapply(seq.int(from = 2, by = 4, length.out = length(cols)), 
+                         \(x) str_sub(data, x, x))
+    ][, lapply(.SD, 
+               \(x) fifelse(x %like% "\\w", x, NA_character_) |> 
+                 na.omit() |> 
+                 list()),
+      .SDcols = patterns("\\d$")] 
+    
+    }]
+
+
+```
+
+
 ## Part 1
+
+```{r}
+
+MovedStacks <-
+  copy(StartingStacks)
+
+for(move_i in seq_len(nrow(Movements))){
+  
+  n_items <- Movements[move_i, n_items]
+  from <- Movements[move_i, from]
+  to <- Movements[move_i, to]
+  
+  MovedStacks[, (to) := .(c(get(from)[[1]][n_items:1], get(to)[[1]]))]
+  MovedStacks[, (from) := .(get(from)[[1]][-(n_items:1)])]
+  
+}
+
+sapply(MovedStacks,\(x) x[[1]][1]) |>
+  paste0(collapse = "")
+
+```
+
+
 ## Part 2
+
+```{r}
+
+MovedStacks <-
+  copy(StartingStacks)
+
+for(move_i in seq_len(nrow(Movements))){
+  
+  n_items <- Movements[move_i, n_items]
+  from <- Movements[move_i, from]
+  to <- Movements[move_i, to]
+  
+  MovedStacks[, (to) := .(c(get(from)[[1]][1:n_items], get(to)[[1]]))]
+  MovedStacks[, (from) := .(get(from)[[1]][-(1:n_items)])]
+  
+}
+
+sapply(MovedStacks,\(x) x[[1]][1]) |>
+  paste0(collapse = "")
+
+```
+
 
 # Day 6:???
 ## Part 1
