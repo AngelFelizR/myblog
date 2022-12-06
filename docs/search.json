@@ -102,14 +102,14 @@
     "href": "projs/Advent-Of-Code-2022/main.html#part-1-5",
     "title": "Advent Of Code 2022",
     "section": "Part 1",
-    "text": "Part 1"
+    "text": "Part 1\n\nUniqueLetters <- 4\n\ncopy(DataStream)[, data := gsub(\"\",\" \", data)\n][, tidytext::unnest_ngrams(.SD, letter, data, n = UniqueLetters)\n][, n_unique := strsplit(letter,\" \") |> unlist() |> uniqueN(),\n  by = .I\n][, n_letter := (1:.N) - 1 + UniqueLetters,\n  by = \"id\"\n][n_unique == UniqueLetters, \n  unique(.SD, by = \"id\")]\n\n      id  letter n_unique n_letter\n   <int>  <char>    <int>    <num>\n1:     1 v h p j        4     1804"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-5",
     "href": "projs/Advent-Of-Code-2022/main.html#part-2-5",
     "title": "Advent Of Code 2022",
     "section": "Part 2",
-    "text": "Part 2"
+    "text": "Part 2\n\nUniqueLetters <- 14\n\ncopy(DataStream)[, data := gsub(\"\",\" \", data)\n][, tidytext::unnest_ngrams(.SD, letter, data, n = UniqueLetters)\n][, n_unique := strsplit(letter,\" \") |> unlist() |> uniqueN(),\n  by = .I\n][, n_letter := (1:.N) - 1 + UniqueLetters,\n  by = \"id\"\n][n_unique == UniqueLetters, \n  unique(.SD, by = \"id\")]\n\n      id                      letter n_unique n_letter\n   <int>                      <char>    <int>    <num>\n1:     1 r n f g h s v p c w j d t l       14     2508"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-6",
