@@ -390,9 +390,59 @@ copy(DataStream)[, data := gsub(""," ", data)
 ```
 
 
-# Day 7:???
+# Day 7: No Space Left On Device
+
+```{r}
+
+Commands<- data.table(history = readLines(here("raw-data/07-input.txt")))
+
+cd <- function(previos_dir, new_dir){
+  
+  if(is.na(new_dir)){
+    return(previos_dir)
+  }
+  
+  if(new_dir != ".."){
+    return(c(previos_dir, 
+             paste0(tail(previos_dir,1),"/",new_dir)))
+  }
+  
+  head(previos_dir, -1)
+  
+}
+
+DirSizes <-
+  copy(Commands)[,`:=`(current_dir = str_match(history,"^\\$ cd (.*)")[,2],
+                       size = str_match(history,"^\\d+") |> as.integer())
+  ][, all_dirs := Reduce(cd, current_dir, accumulate = TRUE)
+  ][history %like% "^\\d",
+    .(all_dirs = all_dirs[[1]]),
+    by = c("history", "size")
+  ][, .(size = sum(size)),
+    by = "all_dirs"]
+
+
+```
+
+
 ## Part 1
+
+```{r}
+
+DirSizes[size < 100000,
+         sum(size)]
+
+```
+
+
 ## Part 2
+
+```{r}
+
+DirSizes[size > 30000000 - (70000000 - DirSizes[all_dirs == "/", size]),
+         min(size)]
+
+```
 
 # Day 8:???
 ## Part 1

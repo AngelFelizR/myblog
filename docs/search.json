@@ -4,21 +4,21 @@
     "href": "about.html",
     "title": "Posts",
     "section": "",
-    "text": "Angel Feliz\n\n\n\n\n\n\nNo matching items"
+    "text": "The Art of Readiable R code\n\n\n\n\n\n\n\n\n\n\n\n\nAngel Feliz\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "index.html",
     "href": "index.html",
     "title": "About",
     "section": "",
-    "text": "Proven experience integrating ad hoc regular expressions to transform, extract and validate text data in data pipelines to find abnormalities and automate repetitive tasks; improving reporting accuracy, reducing waiting times and opening new possibilities to empower decision makers.\nAutodidactic, self-motivated, inquisitive, and eager to apply data science techniques to create business value and increase ROI for your company"
+    "text": "Senior Reporting Analyst with 2 years’ experience using R to process and create business reports in formats as Excel, Word, Power Point, and html.\nProven experience integrating ad hoc regular expressions to transform, extract and validate text data in data pipelines to find abnormalities and automate repetitive tasks; improving reporting accuracy, reducing waiting times and opening new possibilities to empower decision makers.\nAutodidactic, self-motivated, inquisitive, and eager to apply data science techniques to create business value and increase ROI for your company"
   },
   {
     "objectID": "projects.html",
     "href": "projects.html",
     "title": "Projects",
     "section": "",
-    "text": "Data Cleaning\n\n\nText Mining\n\n\n\n\n\n\n\n\n\n\n\nDec 25, 2022\n\n\nAngel Feliz\n\n\n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nChallenge\n\n\n\n\n\n\n\n\n\n\n\nDec 1, 2022\n\n\nAngel Feliz\n\n\n\n\n\n\nNo matching items"
+    "text": "Characteristics of Successful Protests\n\n\n\n\n\n\n\nData Cleaning\n\n\nText Mining\n\n\n\n\n\n\n\n\n\n\n\nDec 25, 2022\n\n\nAngel Feliz\n\n\n\n\n\n\n  \n\n\n\n\nAdvent Of Code 2022\n\n\n\n\n\n\n\nChallenge\n\n\n\n\n\n\n\n\n\n\n\nDec 1, 2022\n\n\nAngel Feliz\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html",
@@ -116,14 +116,14 @@
     "href": "projs/Advent-Of-Code-2022/main.html#part-1-6",
     "title": "Advent Of Code 2022",
     "section": "Part 1",
-    "text": "Part 1"
+    "text": "Part 1\n\nDirSizes[size < 100000,\n         sum(size)]\n\n[1] 1611443"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-6",
     "href": "projs/Advent-Of-Code-2022/main.html#part-2-6",
     "title": "Advent Of Code 2022",
     "section": "Part 2",
-    "text": "Part 2"
+    "text": "Part 2\n\nDirSizes[size > 30000000 - (70000000 - DirSizes[all_dirs == \"/\", size]),\n         min(size)]\n\n[1] 2086088"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-7",
