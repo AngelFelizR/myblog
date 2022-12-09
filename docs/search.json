@@ -130,14 +130,14 @@
     "href": "projs/Advent-Of-Code-2022/main.html#part-1-7",
     "title": "Advent Of Code 2022",
     "section": "Part 1",
-    "text": "Part 1"
+    "text": "Part 1\n\nInvibleCheck <-         \n                        # Checking the matrix going back \n  TidyInTreeGrid[, `:=`(top_invisible = \n                          sum(in_value <= \n                                TreeGrid[(row-1):1, col]),\n                        left_invisble = \n                          sum(in_value <= \n                                TreeGrid[row, (col-1):1]),\n                        \n                        # Checking the matrix going forward\n                        botton_invisible = \n                          sum(in_value <= \n                                TreeGrid[(row+1):DimGrid[1], col]),\n                        right_invisible = \n                          sum(in_value <= \n                                TreeGrid[row, (col+1):DimGrid[2]])),\n                 by = .I\n  ][, invisible_tree := \n      top_invisible > 0 & botton_invisible > 0 & \n      right_invisible > 0 & left_invisble > 0]\n\nprod(DimGrid) - sum(InvibleCheck$invisible_tree)\n\n[1] 1792"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-7",
     "href": "projs/Advent-Of-Code-2022/main.html#part-2-7",
     "title": "Advent Of Code 2022",
     "section": "Part 2",
-    "text": "Part 2"
+    "text": "Part 2\n\nsum_distance <- function(x){\n  if(any(x)){\n    return(seq_along(x)[cumsum(x) == 1] |> min())\n  }\n  return(length(x))\n}\n\n\nDistanceCheck <-\n                        # Checking the matrix going back\n  TidyInTreeGrid[, `:=`(top_distance = \n                          sum_distance(in_value <= \n                                         TreeGrid[(row-1):1, col]),\n                        left_distance = \n                          sum_distance(in_value <= \n                                         TreeGrid[row, (col-1):1]),\n                        \n                        # Checking the matrix going forward\n                        botton_distance = \n                          sum_distance(in_value <= \n                                         TreeGrid[(row+1):DimGrid[1], col]),\n                        right_distance = \n                          sum_distance(in_value <= \n                                         TreeGrid[row, (col+1):DimGrid[2]])),\n                 by = .I\n  ][, scenic_score := \n      top_distance * botton_distance * \n      right_distance  * left_distance]\n\nDistanceCheck[, max(scenic_score)]\n\n[1] 334880"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-8",
