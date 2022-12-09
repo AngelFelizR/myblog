@@ -402,18 +402,19 @@ cd <- function(previos_dir, new_dir){
     return(previos_dir)
   }
   
-  if(new_dir != ".."){
-    return(c(previos_dir, 
-             paste0(tail(previos_dir,1),"/",new_dir)))
+  if(new_dir == ".."){
+    return(head(previos_dir, -1))
   }
   
-  head(previos_dir, -1)
+  c(previos_dir, 
+    paste0(tail(previos_dir,1),"/",new_dir))
+  
   
 }
 
 DirSizes <-
   copy(Commands)[,`:=`(current_dir = str_match(history,"^\\$ cd (.*)")[,2],
-                       size = str_match(history,"^\\d+") |> as.integer())
+                       size = gsub("\\D","",history) |> as.integer())
   ][, all_dirs := Reduce(cd, current_dir, accumulate = TRUE)
   ][history %like% "^\\d",
     .(all_dirs = all_dirs[[1]]),
@@ -444,11 +445,102 @@ DirSizes[size > 30000000 - (70000000 - DirSizes[all_dirs == "/", size]),
 
 ```
 
-# Day 8:???
+# Day 8: Treetop Tree House
+
+```{r}
+TreeGrid <- 
+  data.table(data = readLines(here("raw-data/08-input.txt"))
+  )[,{
+    cols <- paste0("col_", 1:nchar(data[1]))
+    
+    copy(.SD)[, (cols) := tstrsplit(data,"")]
+  }][, !c("data")
+  ][, lapply(.SD, as.integer)
+  ][, as.matrix(.SD)]
+
+DimGrid <- dim(TreeGrid)
+
+
+# As matrices are converted to vectors by column we can transform the internal
+# matrix into a tidy data.frame
+
+TidyInTreeGrid <-
+  data.table(col = rep(2:(DimGrid[2]-1),DimGrid[2]-2) |> sort(),
+             row = rep(2:(DimGrid[1]-1),DimGrid[1]-2),
+             in_value = TreeGrid[-c(1,DimGrid[1]),-c(1,DimGrid[2])] |> as.vector())
+
+```
+
+
 ## Part 1
+
+```{r}
+
+InvibleCheck <-         
+                        # Checking the matrix going back 
+  TidyInTreeGrid[, `:=`(top_invisible = 
+                          sum(in_value <= 
+                                TreeGrid[(row-1):1, col]),
+                        left_invisble = 
+                          sum(in_value <= 
+                                TreeGrid[row, (col-1):1]),
+                        
+                        # Checking the matrix going forward
+                        botton_invisible = 
+                          sum(in_value <= 
+                                TreeGrid[(row+1):DimGrid[1], col]),
+                        right_invisible = 
+                          sum(in_value <= 
+                                TreeGrid[row, (col+1):DimGrid[2]])),
+                 by = .I
+  ][, invisible_tree := 
+      top_invisible > 0 & botton_invisible > 0 & 
+      right_invisible > 0 & left_invisble > 0]
+
+prod(DimGrid) - sum(InvibleCheck$invisible_tree)
+
+```
+
+
+
 ## Part 2
 
-# Day 9:???
+```{r}
+
+sum_distance <- function(x){
+  if(any(x)){
+    return(seq_along(x)[cumsum(x) == 1] |> min())
+  }
+  return(length(x))
+}
+
+
+DistanceCheck <-
+                        # Checking the matrix going back
+  TidyInTreeGrid[, `:=`(top_distance = 
+                          sum_distance(in_value <= 
+                                         TreeGrid[(row-1):1, col]),
+                        left_distance = 
+                          sum_distance(in_value <= 
+                                         TreeGrid[row, (col-1):1]),
+                        
+                        # Checking the matrix going forward
+                        botton_distance = 
+                          sum_distance(in_value <= 
+                                         TreeGrid[(row+1):DimGrid[1], col]),
+                        right_distance = 
+                          sum_distance(in_value <= 
+                                         TreeGrid[row, (col+1):DimGrid[2]])),
+                 by = .I
+  ][, scenic_score := 
+      top_distance * botton_distance * 
+      right_distance  * left_distance]
+
+DistanceCheck[, max(scenic_score)]
+
+```
+
+# Day 9: Rope Bridge
 ## Part 1
 ## Part 2
 
