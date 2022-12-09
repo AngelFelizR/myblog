@@ -501,8 +501,6 @@ prod(DimGrid) - sum(InvibleCheck$invisible_tree)
 
 ```
 
-
-
 ## Part 2
 
 ```{r}
@@ -541,7 +539,16 @@ DistanceCheck[, max(scenic_score)]
 ```
 
 # Day 9: Rope Bridge
+
+```{r}
+TreeGrid <- 
+  data.table(data = readLines(here("raw-data/09-input.txt")))
+
+```
+
+
 ## Part 1
+
 ## Part 2
 
 # Day 10:???
