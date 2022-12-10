@@ -450,24 +450,21 @@ DirSizes[size > 30000000 - (70000000 - DirSizes[all_dirs == "/", size]),
 ```{r}
 TreeGrid <- 
   data.table(data = readLines(here("raw-data/08-input.txt"))
-  )[,{
-    cols <- paste0("col_", 1:nchar(data[1]))
-    
-    copy(.SD)[, (cols) := tstrsplit(data,"")]
+  )[,{ cols <- paste0("col_", 1:nchar(data[1]))
+       copy(.SD)[, (cols) := tstrsplit(data,"")]
   }][, !c("data")
   ][, lapply(.SD, as.integer)
   ][, as.matrix(.SD)]
 
 DimGrid <- dim(TreeGrid)
 
-
 # As matrices are converted to vectors by column we can transform the internal
 # matrix into a tidy data.frame
-
 TidyInTreeGrid <-
   data.table(col = rep(2:(DimGrid[2]-1),DimGrid[2]-2) |> sort(),
              row = rep(2:(DimGrid[1]-1),DimGrid[1]-2),
-             in_value = TreeGrid[-c(1,DimGrid[1]),-c(1,DimGrid[2])] |> as.vector())
+             in_value = TreeGrid[-c(1,DimGrid[1]),-c(1,DimGrid[2])] |>
+                        as.vector())
 
 ```
 
@@ -496,6 +493,7 @@ InvibleCheck <-
   ][, invisible_tree := 
       top_invisible > 0 & botton_invisible > 0 & 
       right_invisible > 0 & left_invisble > 0]
+
 
 prod(DimGrid) - sum(InvibleCheck$invisible_tree)
 
@@ -534,12 +532,13 @@ DistanceCheck <-
       top_distance * botton_distance * 
       right_distance  * left_distance]
 
+
 DistanceCheck[, max(scenic_score)]
 
 ```
 
-# Day 9: Rope Bridge
 
+# Day 9: Rope Bridge
 
 ```{r}
 
