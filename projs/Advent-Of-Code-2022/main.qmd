@@ -538,11 +538,164 @@ DistanceCheck[, max(scenic_score)]
 
 ```
 
-# Day 9:
+# Day 9: Rope Bridge
+
+
+```{r}
+
+RopeBridge <-
+  data.table(data = readLines(here("raw-data/09-input.txt"))
+  )[, c("direction","n_steps") := tstrsplit(data," ")
+  ][, `:=`(data = NULL,
+           n_steps = as.integer(n_steps))
+  ][, .(direction,
+        n_steps = rep(1,n_steps)),
+    by = .I
+  ][direction %chin% c("L","D"), 
+    n_steps := -n_steps
+  ][, `:=`(I = NULL,
+           direction = NULL,
+           n_steps = NULL,
+           y_H_mov = fifelse(direction %chin% c("D","U"),n_steps,0),
+           x_H_mov = fifelse(direction %chin% c("L","R"),n_steps,0))
+  ][, `:=`(y_H_position = cumsum(y_H_mov),
+           x_H_position = cumsum(x_H_mov))]
+
+```
 
 ## Part 1
 
+```{r}
+
+simulate_move <- function(DT,
+                          y_H_pos,
+                          x_H_pos,
+                          T_number){
+  
+  DT <-
+    DT[,`:=`(y_H_pos = y_H,
+             x_H_pos = x_H,
+             y_T_old_pos = c(0,rep(NA_real_,.N-1)),
+             x_T_old_pos = c(0,rep(NA_real_,.N-1)),
+             y_T_new_pos = NA_real_,
+             x_T_new_pos = NA_real_),
+       env = list(y_H = y_H_pos,
+                  x_H = x_H_pos)]
+  
+  RowsToWalk <- nrow(DT) |> seq_len()
+  
+  for(i in RowsToWalk){
+    
+    distance <- c(x = DT$x_H_pos[i] - DT$x_T_old_pos[i],
+                  y = DT$y_H_pos[i] - DT$y_T_old_pos[i])
+    
+    # Don't move
+    if(all(abs(distance) <= 1)){
+      set(DT,i,"y_T_new_pos",DT$y_T_old_pos[i])
+      set(DT,i,"x_T_new_pos",DT$x_T_old_pos[i])
+      
+      # Move TR  
+    }else if(distance["x"] >= 1 & distance["y"] >= 1){
+      set(DT,i,"y_T_new_pos",DT$y_T_old_pos[i] + 1)
+      set(DT,i,"x_T_new_pos",DT$x_T_old_pos[i] + 1)  
+      
+      # Move BR  
+    }else if(distance["x"] >= 1 & distance["y"] <= -1){
+      set(DT,i,"y_T_new_pos",DT$y_T_old_pos[i] - 1)
+      set(DT,i,"x_T_new_pos",DT$x_T_old_pos[i] + 1)  
+      
+      # Move TL  
+    }else if(distance["x"] <= -1 & distance["y"] >= 1){
+      set(DT,i,"y_T_new_pos",DT$y_T_old_pos[i] + 1)
+      set(DT,i,"x_T_new_pos",DT$x_T_old_pos[i] - 1)
+      
+      # Move BL  
+    }else if(distance["x"] <= -1 & distance["y"] <= -1){
+      set(DT,i,"y_T_new_pos",DT$y_T_old_pos[i] - 1)
+      set(DT,i,"x_T_new_pos",DT$x_T_old_pos[i] - 1) 
+      
+      # Move to R
+    }else if(distance["x"] == 2){
+      set(DT,i,"y_T_new_pos",DT$y_T_old_pos[i])
+      set(DT,i,"x_T_new_pos",DT$x_T_old_pos[i] + 1)
+      
+      # Move to L
+    }else if(distance["x"] == -2){
+      set(DT,i,"y_T_new_pos",DT$y_T_old_pos[i])
+      set(DT,i,"x_T_new_pos",DT$x_T_old_pos[i] - 1)
+      
+      # Move to T  
+    }else if(distance["y"] == 2){
+      set(DT,i,"y_T_new_pos",DT$y_T_old_pos[i] + 1)
+      set(DT,i,"x_T_new_pos",DT$x_T_old_pos[i])
+      
+      # Move to B  
+    }else if(distance["y"] == -2){
+      set(DT,i,"y_T_new_pos",DT$y_T_old_pos[i] - 1)
+      set(DT,i,"x_T_new_pos",DT$x_T_old_pos[i])
+    }
+    
+    
+    # Moving the new position to be old one in next row
+    if(i < tail(RowsToWalk,1)){
+      set(DT,i+1L,"y_T_old_pos",DT$y_T_new_pos[i])
+      set(DT,i+1L,"x_T_old_pos",DT$x_T_new_pos[i])
+    }
+    
+  }
+  
+  DT[, c("y_H_pos", "x_H_pos", "y_T_old_pos", "x_T_old_pos") := NULL]
+  
+  setnames(DT, c("y_T_new_pos", "x_T_new_pos"),
+           paste0(c("y_","x_"), T_number, "_new_pos"))
+  
+  return(DT)
+  
+}
+
+
+BaseTable1 <- copy(RopeBridge)
+
+simulate_move(BaseTable1,
+              y_H_pos = "y_H_position",
+              x_H_pos = "x_H_position",
+              T_number = "T")
+
+
+BaseTable1[, unique(.SD),
+          .SDcols = c("x_T_new_pos","y_T_new_pos")
+][, .N]
+
+```
+
+
 ## Part 2
+
+```{r}
+
+BaseTable2 <- copy(RopeBridge)
+
+Iteration <-
+  lapply(1:8,\(x) c(str_glue("y_{x}_new_pos"), str_glue("x_{x}_new_pos"), x+1)) |>
+  (\(LIST) append(list(c("y_H_position","x_H_position","1")),
+                  LIST))()
+
+
+for(i in seq_along(Iteration)){
+  
+  simulate_move(BaseTable2,
+                y_H_pos = Iteration[[i]][1],
+                x_H_pos = Iteration[[i]][2],
+                T_number = Iteration[[i]][3])
+  
+}
+
+BaseTable2[, unique(.SD),
+          .SDcols = c("x_9_new_pos","y_9_new_pos")
+][, .N]
+
+```
+
 
 # Day 10:???
 ## Part 1
