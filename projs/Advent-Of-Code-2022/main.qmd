@@ -695,9 +695,49 @@ BaseTable2[, unique(.SD), .SDcols = c("x_9_new_pos","y_9_new_pos")][, .N]
 ```
 
 
-# Day 10:???
+# Day 10: Cathode-Ray Tube
+
+```{r}
+ClockCircuit <-
+  data.table(data = readLines(here("raw-data/10-input.txt"))
+  )[, c("instruction","value") := tstrsplit(data," ")
+  ][, `:=`(data = NULL,
+           value = NULL,
+           id = .I,
+           value_1 = 0,
+           value_2 = fcoalesce(as.double(value),0))
+  ][, melt(.SD, id.vars = c("instruction","id"),
+           variable.factor = FALSE)
+  ][order(id), !c("variable")
+  ][, unique(.SD)
+  ][, `:=`(id = NULL,
+           X = cumsum(c(1,head(value,-1))),
+           cycle = .I)
+  ][, signal_strength := X * cycle]
+
+```
+
+
 ## Part 1
+
+```{r}
+
+ClockCircuit[seq(from = 20, to = 220, by =40),
+             sum(signal_strength)]
+
+```
+
+
 ## Part 2
+
+```{r}
+ClockCircuit[,`:=`(row = (cycle-1) %/% 40,
+                   col = (cycle-1) %% 40)
+][, pixel := fifelse(abs(col-X)<=1, "#",".")
+][, paste0(pixel,collapse = ""),
+  by = "row"]
+```
+
 
 # Day 11:???
 ## Part 1

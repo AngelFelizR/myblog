@@ -158,14 +158,14 @@
     "href": "projs/Advent-Of-Code-2022/main.html#part-1-9",
     "title": "Advent Of Code 2022",
     "section": "Part 1",
-    "text": "Part 1"
+    "text": "Part 1\n\nClockCircuit[seq(from = 20, to = 220, by =40),\n             sum(signal_strength)]\n\n[1] 11720"
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-2-9",
     "href": "projs/Advent-Of-Code-2022/main.html#part-2-9",
     "title": "Advent Of Code 2022",
     "section": "Part 2",
-    "text": "Part 2"
+    "text": "Part 2\n\nClockCircuit[,`:=`(row = (cycle-1) %/% 40,\n                   col = (cycle-1) %% 40)\n][, pixel := fifelse(abs(col-X)<=1, \"#\",\".\")\n][, paste0(pixel,collapse = \"\"),\n  by = \"row\"]\n\n     row                                       V1\n   <num>                                   <char>\n1:     0 ####.###...##..###..####.###...##....##.\n2:     1 #....#..#.#..#.#..#.#....#..#.#..#....#.\n3:     2 ###..#..#.#....#..#.###..#..#.#.......#.\n4:     3 #....###..#....###..#....###..#.......#.\n5:     4 #....#.#..#..#.#.#..#....#....#..#.#..#.\n6:     5 ####.#..#..##..#..#.####.#.....##...##.."
   },
   {
     "objectID": "projs/Advent-Of-Code-2022/main.html#part-1-10",
