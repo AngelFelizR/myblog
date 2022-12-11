@@ -45,10 +45,58 @@ As a Reporting Analyst and I am always creating and changing scripts and after a
 
 In order a code to be readable needs to:
 
-1. Have explicit names for variables and functions.
+1. Have explicit names for variables, functions and function arguments.
 
-2. Have commentaries that explain the reasons behind the code.
+2. Have commentaries that explain the reasons behind the code. At the end, the reader should know as much as the writer did.
 
 3. Be understood without reading it twice.
+
+
+# Practical Tecniques
+
+Once we know what we want to achieve it results really useful to know some techniques that might help us for that purpose. In this article, we will use `R` to make all the our examples and the `datasets::mtcars` data.frame as it is widely use for simple examples.
+
+
+## Naming variables
+
+- Variables should be named base on its value.
+- Words like *is*, *has* and *should* are make clearer a boolean variable.
+- If the variable has a measurement we can use suffixes to make it explicit.
+- If a variable is changed in many stages the variable name should show the current stage.
+- A variable should remain the same value across the project.
+  
+For example, if we run `?mtcars` in the `R` console we can see a description of each variable in the `mtcars` dataset:
+
+- **mpg**:	Miles/(US) gallon
+-	**cyl**:	Number of cylinders
+-	**disp**:	Displacement (cu.in.)
+-	**hp**:	Gross horsepower
+-	**drat**:	Rear axle ratio
+- **wt**:	Weight (1000 lbs)
+-	**qsec**:	1/4 mile time
+-	**vs**:	Engine (0 = V-shaped, 1 = straight)
+- **am**:	Transmission (0 = automatic, 1 = manual)
+-	**gear**:	Number of forward gears
+- **carb**:	Number of carburetors
+
+After reading each column description it clean why each variable has its name, but it becomes clear that it is impossible for anybody to understand what each variable contains just by reading each name.
+
+- **mpg**: If this case *m* means miles, *p* means per and *g* means gallons. It isn't explicit, *m* sometimes means meters or any other thing. It could be obvious for some with car a basic knowledge, but for many people the meaning of variable could be confusing. To fix this problems let's write word completely.
+
+- ****
+
+Let's changes `mtcars` names for more explicit ones.
+
+```{r}
+
+mtcats_new_names <-
+  c("mpg" = "miles_per_gallon",
+    "cyl"= "cylinders_count",
+    "disp" = "displacement_in3",
+    "hp" = "power_hp",
+    )
+
+```
+
 
 
