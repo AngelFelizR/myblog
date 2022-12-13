@@ -4073,7 +4073,7 @@ vertical-align: -.125em;
   <li><a href="#practical-tecniques" id="toc-practical-tecniques" class="nav-link" data-scroll-target="#practical-tecniques"><span class="toc-section-number">2</span>  Practical Tecniques</a>
   <ul class="collapse">
   <li><a href="#naming-variables" id="toc-naming-variables" class="nav-link" data-scroll-target="#naming-variables"><span class="toc-section-number">2.1</span>  Naming variables</a></li>
-  <li><a href="#naming-functions-and-arguments" id="toc-naming-functions-and-arguments" class="nav-link" data-scroll-target="#naming-functions-and-arguments"><span class="toc-section-number">2.2</span>  Naming functions and arguments</a></li>
+  <li><a href="#naming-functions-and-its-arguments" id="toc-naming-functions-and-its-arguments" class="nav-link" data-scroll-target="#naming-functions-and-its-arguments"><span class="toc-section-number">2.2</span>  Naming functions and its arguments</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -4189,8 +4189,8 @@ Valiant                          1</code></pre>
 <p>As we changed the original data it is important to save a new variable specify how data change. In this case we just added the word <strong>renamed</strong> so <code>mtcars</code> will keep the same value across the project.</p>
 <p>To write good variable names might take some iteration and you might need to play devil’s advocate in under to find out a better name than the initial one.</p>
 </section>
-<section id="naming-functions-and-arguments" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="naming-functions-and-arguments"><span class="header-section-number">2.2</span> Naming functions and arguments</h2>
+<section id="naming-functions-and-its-arguments" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="naming-functions-and-its-arguments"><span class="header-section-number">2.2</span> Naming functions and its arguments</h2>
 <p>Creating explicit functions names makes much easier to understand any code. I could make a really complex process to become a very simple one. Some tips to follow are:</p>
 <ol type="1">
 <li>Start the function with a explicit verb to avoid misunderstandings. Below we can see some recommendations from the book.</li>
@@ -4251,6 +4251,41 @@ Valiant                          1</code></pre>
 </tr>
 </tbody>
 </table>
+<p>For example, we want to create a function that filters the value over the median of any variable, we named a for example <code>filter_median</code>, but that could bring some confusion, some could understand that you will keep or remove all values equals to the median. A better name can be <code>keep_over_median</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>keep_over_median <span class="ot">&lt;-</span> <span class="cf">function</span>(DF, variable){</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.numeric</span>(DF[[variable]])){</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="fu">paste0</span>(variable,<span class="st">&quot; must be numeric&quot;</span>))</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  DF[DF[[variable]] <span class="sc">&gt;</span> <span class="fu">median</span>(DF[[variable]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>), ]</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="fu">keep_over_median</span>(MtCarsRenamed, <span class="at">variable =</span> <span class="st">&quot;miles_per_gallon&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 15</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>keep_median_bigger <span class="ot">&lt;-</span> <span class="cf">function</span>(DF, variable){</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(<span class="sc">!</span><span class="fu">is.numeric</span>(DF[[variable]])){</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="fu">paste0</span>(variable,<span class="st">&quot; must be numeric&quot;</span>))</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  DF[DF[[variable]] <span class="sc">&gt;=</span> <span class="fu">median</span>(DF[[variable]], <span class="at">na.rm =</span> <span class="cn">TRUE</span>), ]</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">keep_median_bigger</span>(MtCarsRenamed, <span class="at">variable =</span> <span class="st">&quot;miles_per_gallon&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 17</code></pre>
+</div>
+</div>
 
 
 </section>

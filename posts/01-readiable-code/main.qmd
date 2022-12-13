@@ -104,7 +104,7 @@ As we changed the original data it is important to save a new variable specify h
 
 To write good variable names might take some iteration and you might need to play devil's advocate in under to find out a better name than the initial one.
 
-## Naming functions and arguments
+## Naming functions and its arguments
 
 Creating explicit functions names makes much easier to understand any code. I could make a really complex process to become a very simple one. Some tips to follow are:
 
@@ -127,6 +127,41 @@ Creating explicit functions names makes much easier to understand any code. I co
 |min and max | Useful to denominate include limits|
 |first and last| Useful to denominate exclusive limits|
 |begin and end| Useful to denominate ether inconclusive or exclusive limits|
+
+For example, we want to create a function that filters the value over the median of any variable, we named a for example `filter_median`, but that could bring some confusion, some could understand that you will keep or remove all values equals to the median. A better name can be `keep_over_median`.
+
+```{r}
+
+keep_over_median <- function(DF, variable){
+  
+  if(!is.numeric(DF[[variable]])){
+    stop(paste0(variable," must be numeric"))
+  }
+  
+  DF[DF[[variable]] > median(DF[[variable]], na.rm = TRUE), ]
+}
+
+
+keep_over_median(MtCarsRenamed, variable = "miles_per_gallon") |>
+  nrow()
+
+```
+
+
+```{r}
+keep_median_bigger <- function(DF, variable){
+  
+  if(!is.numeric(DF[[variable]])){
+    stop(paste0(variable," must be numeric"))
+  }
+  
+  DF[DF[[variable]] >= median(DF[[variable]], na.rm = TRUE), ]
+}
+
+
+keep_median_bigger(MtCarsRenamed, variable = "miles_per_gallon") |>
+  nrow()
+```
 
 
 
