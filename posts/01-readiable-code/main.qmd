@@ -60,7 +60,7 @@ Once we know what we want to achieve it results really useful to know some techn
 ## Naming variables
 
 - Variables should be named base on its value.
-- Words like *is*, *has* and *should* are make clearer a boolean variable.
+- Words like *is*, *has* and *should* are make clearer a Boolean variables.
 - If the variable has a measurement we can use suffixes to make it explicit.
 - If a variable is changed in many stages the variable name should show the current stage.
 - A variable should remain the same value across the project.
@@ -79,24 +79,35 @@ For example, if we run `?mtcars` in the `R` console we can see a description of 
 -	**gear**:	Number of forward gears
 - **carb**:	Number of carburetors
 
-After reading each column description it clean why each variable has its name, but it becomes clear that it is impossible for anybody to understand what each variable contains just by reading each name.
+After reading each column description it is easy to understand each column name, but it it is impossible for anybody to understand what each variable contains by reading each column name. Just as a example we can say:
 
 - **mpg**: If this case *m* means miles, *p* means per and *g* means gallons. It isn't explicit, *m* sometimes means meters or any other thing. It could be obvious for some with car a basic knowledge, but for many people the meaning of variable could be confusing. To fix this problems let's write word completely.
 
-- ****
+- **cyl**: It stands for first 3 letters of cylinder, but no all readers will understand that, so it is better to write the complete word and add the unit used.
 
 Let's changes `mtcars` names for more explicit ones.
 
 ```{r}
 
-mtcats_new_names <-
+MtCarsNewNames <-
   c("mpg" = "miles_per_gallon",
     "cyl"= "cylinders_count",
     "disp" = "displacement_in3",
     "hp" = "power_hp",
-    )
+    "drat" = "rear_axle_ratio",
+    "wt" = "weight_klb",
+    "qsec" = "quarter_mile_secs",
+    "vs" = "engine_is_straight",
+    "am" = "transmission_is_manual",
+    "gear" = "gear_count",
+    "carb" = "carburetor_count")
+
+MtCarsRenamed <- mtcars
+names(MtCarsRenamed) <- MtCarsNewNames[names(mtcars)]
+
+head(MtCarsRenamed)
 
 ```
 
-
+As we changed the original data it is important to save a new variable specify how data change. In this case we just added the word **renamed** so `mtcars` will keep the same value across the project.
 
