@@ -56,36 +56,27 @@ In order a code to be readable needs to:
 
 Once we know what we want to achieve it results really useful to know some techniques that might help us for that purpose. In this article, we will use `R` to make all the our examples and the `datasets::mtcars` data.frame as it is widely use for simple examples.
 
-
 ## Naming variables
 
-- Variables should be named base on its value.
-- Words like *is*, *has* and *should* are make clearer a Boolean variables.
-- If the variable has a measurement we can use suffixes to make it explicit.
-- If a variable is changed in many stages the variable name should show the current stage.
-- A variable should remain the same value across the project.
+Defining good variables names in general is more important than writing a good comment and should try to give as much context as possible in variable name. Some tips to follow are:
+
+1. Variable should be named base on its value. 
+    - Words like *is*, *has* and *should* make clearer a Boolean variables by avoiding negations.
+    - Looping index can be identify by using a suffix, for example: club_i or table_i rather just i
+
+2. If the variable has a measurement we can use suffixes to make it explicit.
   
-For example, if we run `?mtcars` in the `R` console we can see a description of each variable in the `mtcars` dataset:
+3. A variable should remain the same value across the project. 
+    - If a variable is changed in many stages the variable name should show the current stage.
+    - If you need to create many temporal intermediate variables to get a final resulta it's better to write a function.
 
-- **mpg**:	Miles/(US) gallon
--	**cyl**:	Number of cylinders
--	**disp**:	Displacement (cu.in.)
--	**hp**:	Gross horsepower
--	**drat**:	Rear axle ratio
-- **wt**:	Weight (1000 lbs)
--	**qsec**:	1/4 mile time
--	**vs**:	Engine (0 = V-shaped, 1 = straight)
-- **am**:	Transmission (0 = automatic, 1 = manual)
--	**gear**:	Number of forward gears
-- **carb**:	Number of carburetors
+If we run `?mtcars` in the `R` console we can see a description of each variable in the `mtcars` dataset. After reading each column description it is easy to understand each column name, but it is almost impossible to understand what each variable contains by just reading each column name. Let's see two examples:
 
-After reading each column description it is easy to understand each column name, but it it is impossible for anybody to understand what each variable contains by reading each column name. Just as a example we can say:
-
-- **mpg**: If this case *m* means miles, *p* means per and *g* means gallons. It isn't explicit, *m* sometimes means meters or any other thing. It could be obvious for some with car a basic knowledge, but for many people the meaning of variable could be confusing. To fix this problems let's write word completely.
+- **mpg**: In this case, *m* means *miles*, *p* means *per* and *g* means *gallons*. It isn't explicit, *m* could mean meters or any other thing. It could be obvious for some with car a basic knowledge, but for many people the meaning of variable could be confusing. To fix this problems let's write word completely.
 
 - **cyl**: It stands for first 3 letters of cylinder, but no all readers will understand that, so it is better to write the complete word and add the unit used.
 
-Let's changes `mtcars` names for more explicit ones.
+Once understand the point, we can create a new `data.frame` applying tips mencined.
 
 ```{r}
 
@@ -110,4 +101,32 @@ head(MtCarsRenamed)
 ```
 
 As we changed the original data it is important to save a new variable specify how data change. In this case we just added the word **renamed** so `mtcars` will keep the same value across the project.
+
+To write good variable names might take some iteration and you might need to play devil's advocate in under to find out a better name than the initial one.
+
+## Naming functions and arguments
+
+Creating explicit functions names makes much easier to understand any code. I could make a really complex process to become a very simple one. Some tips to follow are:
+
+1. Start the function with a explicit verb to avoid misunderstandings. Below we can see some recommendations from the book.
+
+| Word | Alternatives |
+|:----:|------------:|
+| send | deliver, dispatch, announce, distribute, route |
+| find | search, extract, locate, recover |
+| start | launch, create, begin, open |
+| make | create, set up, build, generate, compose, add, new |
+
+
+2. Avoid using abstract names that don't desecrate the output.
+
+3. Some general recommendations for function arguments are:
+
+| Word | Use|
+|:-----|:---|
+|min and max | Useful to denominate include limits|
+|first and last| Useful to denominate exclusive limits|
+|begin and end| Useful to denominate ether inconclusive or exclusive limits|
+
+
 
