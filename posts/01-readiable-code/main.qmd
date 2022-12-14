@@ -13,7 +13,7 @@ format:
     self-contained: true
     number-sections: true
     smooth-scroll: true
-image: "readable-code-book.jpg"
+image: "readability-tests.png"
 categories: [Learning Journey]
 ---
 
@@ -34,12 +34,11 @@ code{color: #0c5bd1;}
 
 When we start our journey as a programmers it's normal to get exited by the new positives. We get the capacity to do many things that otherwise would be impossible, making projects faster and assuring consistency.
 
-But the problems start when you need to modify a script that you wrote 6 in the past. That's when you found out that you don't remember why you were applying some specific filters or calculating a value in a odd way.
+But the problems start when you need to modify a script that you wrote 6 months in the past. That's when you found out that you don't remember why you were applying some specific filters or calculating a value in a odd way.
 
-As a Reporting Analyst and I am always creating and changing scripts and after applying the tips provided in the book I could reduce the time needed to apply changes from 5 to 2 days (60% faster).
+As a Reporting Analyst and I am always creating and changing scripts and after applying the tips provided in **The Art of Readable Code** by *Dustin Boswell* and *Trevor Foucher* I could reduce the time needed to apply changes from 5 to 2 days (60% faster).
 
-<img src="readable-code-book.jpg" alt="Source: https://www.amazon.com/Art-Readable-Code-Practical-Techniques/dp/0596802293" class="center">
-
+[![From: uxmastery.com](readability-tests.png)](https://uxmastery.com/wp-content/uploads/2013/09/readability-tests.png)
 
 # How do you know if your code is readable?
 
@@ -301,7 +300,6 @@ validate_prob <- function(prob) {
   if(!all(prob > 0 & prob < 1)) stop("prob must be in range (0,1)")
   if(length(prob) != 1) stop("prob must have lenght == 1")
 }
-
 
 
 # Updating core function
