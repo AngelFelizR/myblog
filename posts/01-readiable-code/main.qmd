@@ -111,7 +111,7 @@ Creating explicit functions names makes much easier to understand any code. I co
 1. Start the function with a explicit verb to avoid misunderstandings. Below we can see some recommendations from the book.
 
 | Word | Alternatives |
-|:----:|------------:|
+|:----:|:-------------|
 | send | deliver, dispatch, announce, distribute, route |
 | find | search, extract, locate, recover |
 | start | launch, create, begin, open |
@@ -128,40 +128,207 @@ Creating explicit functions names makes much easier to understand any code. I co
 |first and last| Useful to denominate exclusive limits|
 |begin and end| Useful to denominate ether inconclusive or exclusive limits|
 
-For example, we want to create a function that filters the value over the median of any variable, we named a for example `filter_median`, but that could bring some confusion, some could understand that you will keep or remove all values equals to the median. A better name can be `keep_over_median`.
+For example, we want to create a function that filters the value over a specific percentile of any variable, we named a for example `filter_percentile`, but that could bring some confusion, some could understand that you will keep or remove all values equals to the percentile value. A better name can be `keep_over_percentile`.
 
 ```{r}
 
-keep_over_median <- function(DF, variable){
+extract_over_percentile <- function(DF, variable, prob){
   
-  if(!is.numeric(DF[[variable]])){
-    stop(paste0(variable," must be numeric"))
-  }
+  DF[DF[[variable]] > quantile(DF[[variable]], na.rm = TRUE, probs = prob), ]
   
-  DF[DF[[variable]] > median(DF[[variable]], na.rm = TRUE), ]
 }
 
-
-keep_over_median(MtCarsRenamed, variable = "miles_per_gallon") |>
+MtCarsRenamed |>
+  extract_over_percentile(variable = "miles_per_gallon", prob = 0.50) |>
   nrow()
 
 ```
 
 
+## Commenting correctly
+
+Writing good comments can be challenging as everything looks so clear when are writing code but here are some tips that might help you:
+
+1. Each project should have a README file an introduction to the code with important point that you would tell a new team member.
+
+2. Some important topics to comment are:
+    * How a function behaves in some situations and also a good example.
+    * Why do we use certain method.
+    * Things that we couldn't solve and how we would do it.
+    * Explaining why do we use certain values in constants.
+
+3. If you are commenting to describe some code reading the comment should be faster than reading the code.
+
+4. Don’t comment bad names, fix them instead.
+
+5. Write commentaries in 3 steps:
+    * Write down whatever comment is on your mind
+    * Read the comment and see what needs to be improved
+    * Make improvements
+   
+    
+Let's see a quick example here I clarify reasons behaind the code.
+    
 ```{r}
-keep_median_bigger <- function(DF, variable){
-  
-  if(!is.numeric(DF[[variable]])){
-    stop(paste0(variable," must be numeric"))
-  }
-  
-  DF[DF[[variable]] >= median(DF[[variable]], na.rm = TRUE), ]
-}
 
+# Selecting cars with high energy efficiency as 
+# the final user doesn't care about car speed or power.
 
-keep_median_bigger(MtCarsRenamed, variable = "miles_per_gallon") |>
-  nrow()
+EffientCars <-
+  MtCarsRenamed[order(-MtCarsRenamed$miles_per_gallon), 
+                c("miles_per_gallon", 
+                  "transmission_is_manual",
+                  "engine_is_straight")] |>
+  extract_over_percentile(variable = "miles_per_gallon", prob = 0.75)
+
+```
+    
+    
+## Code style
+
+Code style is important as it allows you to scan quickly many lines of code before reading the detail of each line. Some advice to improve code style are:
+
+1. Ensure that similar code looks similar, it might help you to identify important spelling mistakes.
+
+2. Complete all the process you need to do related to one task before moving to other. For example, import all your data before applying changes and transform all your data before exporting reports. The function `source` it's very useful if we want to break log code into main parts.
+
+3. Avoid repetitive comments, instead divide your code into blocks with comments.
+
+4. Use `|>` from base R or `%>%` from magrittr package to avoid creating temporal variable without losing readability.
+
+5. When making `TRUE` or `FALSE` test it useful to store the result in a variable with a explicit of what was the test about.
+
+```{r}
+
+HasMoreThan5Cars <- nrow(EffientCars) > 5
+
+if(HasMoreThan5Cars) EffientCars
+
 ```
 
 
+6. Write constants on the right side of the Boolean test.
 
+```{r}
+#| eval: false
+
+# It's better to write
+nrow(EffientCars) > 5
+
+# Than writing
+5 <= nrow(EffientCars)
+
+```
+
+
+7. Avoid writing nested if stamens, instead try to negate each Boolean test.
+
+```{r}
+#| eval: false
+
+# it's better to write
+extract_over_percentile <- function(DF, variable, prob){
+  
+  if(!is.data.frame(DF)) stop("DF must be a data.frame")
+  if(typeof(variable) != "character") stop("variable must be a character")
+  if(!is.numeric(DF[[variable]])) stop(paste0(variable, " must be a character"))
+  if(typeof(prob) != "double") stop("prob must be a double")
+  if(!all(prob > 0 & prob < 1)) stop("prob must be in range (0,1)")
+  
+  DF[DF[[variable]] > quantile(DF[[variable]], na.rm = TRUE, probs = prob), ]
+  
+}
+
+
+# Than writing
+extract_over_percentile <- function(DF, variable, prob){
+  
+  if(is.data.frame(DF)){
+    
+    if(typeof(variable) == "character"){
+      
+      if(is.numeric(DF[[variable]])){
+        
+        if(typeof(prob) == "double"){
+          
+          if(all(prob > 0 & prob < 1)){
+            
+   DF[DF[[variable]] > quantile(DF[[variable]], na.rm = TRUE, probs = prob), ]   
+            
+          }else{
+            stop("prob must be in range (0,1)")
+          }
+          
+        }else{
+          stop("prob must be a double")
+        }
+        
+      }else{
+        stop(paste0(variable, " must be a character")) 
+      }
+      
+    }else{
+      stop("variable must be a character")
+    }
+  }else{
+    stop("DF must be a data.frame")
+  }
+
+}
+
+```
+
+
+8. You can apply Morgan's Law if A and B are Boolean variables: **! ( A | B) == !A & !B**
+
+9. If a function it's getting long, you can extract from the function one or more secondary functions that solve smaller problems.
+
+```{r}
+
+# Creating validation functions
+
+validate_df <- function(DF){
+  if(!is.data.frame(DF)) stop("DF must be a data.frame")
+}
+
+validate_variable <- function(DF, variable){
+  if(typeof(variable) != "character") stop("variable must be a character")
+  if(!is.numeric(DF[[variable]])) stop(paste0(variable, " must be a character"))
+}
+
+validate_prob <- function(prob) {
+  if(typeof(prob) != "double") stop("prob must be a double")
+  if(!all(prob > 0 & prob < 1)) stop("prob must be in range (0,1)")
+  if(length(prob) != 1) stop("prob must have lenght == 1")
+}
+
+
+
+# Updating core function
+
+extract_over_percentile <- function(DF, variable, prob){
+  
+  validate_df(DF)
+  validate_variable(DF, variable)
+  validate_prob(prob)
+  
+  DF[DF[[variable]] > quantile(DF[[variable]], na.rm = TRUE, probs = prob), ]
+  
+}
+
+MtCarsRenamed[order(-MtCarsRenamed$miles_per_gallon), 
+              c("miles_per_gallon", 
+                "transmission_is_manual",
+                "engine_is_straight")] |>
+  extract_over_percentile(variable = "miles_per_gallon", prob = 0.75)
+
+
+```
+
+# Conclusion {.unnumbered}
+
+Writing high quality code it's important, but it takes time and practice. At this point, I just want to share the next words by Hadley Wickham.
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">The only way to write good code is to write tons of shitty code first. Feeling shame about bad code stops you from getting to good code</p>&mdash; Hadley Wickham (@hadleywickham) <a href="https://twitter.com/hadleywickham/status/589068687669243905?ref_src=twsrc%5Etfw">April 17, 2015</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+I hope you have learnt something new that you find uselful.
