@@ -4,7 +4,7 @@
     "href": "about.html",
     "title": "Posts",
     "section": "",
-    "text": "The Art of Readiable R code\n\n\n\n\n\n\n\nLearning Journey\n\n\n\n\n\n\n\n\n\n\n\nAngel Feliz\n\n\n\n\n\n\nNo matching items"
+    "text": "The Art of Readiable R code\n\n\n\n\n\n\n\nTutorial\n\n\n\n\n\n\n\n\n\n\n\nDec 14, 2022\n\n\nAngel Feliz\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "index.html",
@@ -18,7 +18,7 @@
     "href": "posts/01-readiable-code/main.html",
     "title": "The Art of Readiable R code",
     "section": "",
-    "text": "When we start our journey as a programmers it’s normal to get exited by the new positives. We get the capacity to do many things that otherwise would be impossible, making projects faster and assuring consistency.\nBut the problems start when you need to modify a script that you wrote 6 months in the past. That’s when you found out that you don’t remember why you were applying some specific filters or calculating a value in a odd way.\nAs a Reporting Analyst and I am always creating and changing scripts and after applying the tips provided in The Art of Readable Code by Dustin Boswell and Trevor Foucher I could reduce the time needed to apply changes from 5 to 2 days (60% faster).\n\n\n\nFrom: uxmastery.com"
+    "text": "When we start our journey as a programmers it’s normal to get exited by the new positives. We get the capacity to do many things that otherwise would be impossible, making projects faster and assuring consistency.\nBut the problems start when you need to modify a script that you wrote 6 months in the past. That’s when you found out that you don’t remember why you were applying some specific filters or calculating a value in a odd way.\nAs a Reporting Analyst and I am always creating and changing scripts and after applying the tips provided in The Art of Readable Code by Dustin Boswell and Trevor Foucher I could reduce the time needed to apply changes from 5 to 2 days (60% faster).\n\n\n\nFrom: https://uxmastery.com/wp-content/uploads/2013/09/readability-tests.png"
   },
   {
     "objectID": "posts/01-readiable-code/main.html#naming-variables",

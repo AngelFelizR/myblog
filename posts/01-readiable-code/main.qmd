@@ -1,6 +1,7 @@
 ---
 title: "The Art of Readiable R code"
 author: "Angel Feliz"
+date: "14 December 2022"
 editor: source
 format: 
   html:
@@ -14,7 +15,7 @@ format:
     number-sections: true
     smooth-scroll: true
 image: "readability-tests.png"
-categories: [Learning Journey]
+categories: [Tutorial]
 ---
 
 <style>
@@ -38,7 +39,7 @@ But the problems start when you need to modify a script that you wrote 6 months 
 
 As a Reporting Analyst and I am always creating and changing scripts and after applying the tips provided in **The Art of Readable Code** by *Dustin Boswell* and *Trevor Foucher* I could reduce the time needed to apply changes from 5 to 2 days (60% faster).
 
-[![From: uxmastery.com](readability-tests.png)](https://uxmastery.com/wp-content/uploads/2013/09/readability-tests.png)
+![From: https://uxmastery.com/wp-content/uploads/2013/09/readability-tests.png](readability-tests.png)
 
 # How do you know if your code is readable?
 
