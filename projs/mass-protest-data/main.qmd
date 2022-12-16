@@ -187,14 +187,14 @@ find_string_approximation <- function(DT1,
 - **get_percentile_ci**
 
 ```{r}
-get_percentile_ci <- function(x, conf_level = 0.95, na.rm = TRUE){
+get_percentile_ci <- function(DF, variable, conf_level = 0.95, na.rm = TRUE){
   
   percentile1 <- (1-conf_level)/2
   percentile2 <- percentile1 + conf_level
   
-  data.table(lower_ci = quantile(x, probs = percentile1, na.rm = na.rm, names =FALSE),
-             point_estimate = median(x, na.rm = na.rm),
-             upper_ci = quantile(x, probs = percentile2, na.rm = na.rm, names =FALSE))
+  data.table(lower_ci = quantile(DF[[variable]], probs = percentile1, na.rm = na.rm, names =FALSE),
+             point_estimate = median(DF[[variable]], na.rm = na.rm),
+             upper_ci = quantile(DF[[variable]], probs = percentile2, na.rm = na.rm, names =FALSE))
 }
 ```
 
@@ -1045,6 +1045,7 @@ CorSummary <-
   ][, lapply(.SD, \(x) x * 1),
     .SDcols = \(x) is.logical(x) | is.numeric(x)] |> 
   correlation() |>
+  as.data.frame() |>
   as.data.table()
 
 CorSummary[1:6,
@@ -1080,10 +1081,11 @@ By checking the last graph, we can see some interesting relations:
 
 3. **Labor wage disputes** have national impact in countries with high polity.
 
+Now we know that some relations are present in the data let's explore each of then.
 
-### Are some responses more often in countries with high polity?
+### Do state responses change depending if the state is a democracy or an autocracy?
 
-To answer that question we need to define what it is the minimum **polity** value to distinct between a democracy and a autocracy. 
+To answer that question we need to define what it is the minimum **polity value** to distinct between a democracy and a autocracy. 
 
 ```{r}
 
@@ -1106,97 +1108,140 @@ ProtestLocationExtracted[!is.na(polity)] |>
 
 ```
 
-By checking the distribution it seems good taking `r PolityChangeValue` as the minimum polity level to say that the country it's a democracy as `r names(PolityChangeValue)` of protest take place in countries with lower values.
+By checking the distribution, it seems good taking `r PolityChangeValue` as the minimum polity level to say that the country it's a democracy as `r names(PolityChangeValue)` of protest take place in countries with lower values.
 
 ```{r}
 
 set.seed(2022)
 
-ProtestLocationExtracted[!is.na(polity), 
-                         melt(.SD, 
-                              id.vars = c("id","polity"),
-                              value.name = "Happen",
-                              variable.name = "Response",
-                              na.rm = TRUE), 
-                         .SDcols = patterns("^(id|polity)$|^res")
-][, `:=`(goverment_type = fifelse(polity < PolityChangeValue, "Low Democracy", "High Democracy"),
-         polity = NULL,
-         Response = sub("^res_","",Response) |> str_to_title())
-][, specify(.SD,
-            formula = Happen ~ goverment_type, 
-            success = "TRUE") |>
-    generate(reps = 1000, type = "bootstrap") |>
-    calculate(stat = "ratio of props", 
-              order = c("High Democracy", "Low Democracy")) |>
-    (\(DF) DF$stat)() |>
-    get_percentile_ci(),
-  by = "Response"
-][, Response := fct_reorder(Response, point_estimate, sum)] |>
-  ggplot(aes(point_estimate , Response))+
+ResposeVsGovermentType <-
+  ProtestLocationExtracted[!is.na(polity), 
+                           melt(.SD, 
+                                id.vars = c("id","polity"),
+                                value.name = "Happen",
+                                variable.name = "Response",
+                                variable.factor = FALSE,
+                                na.rm = TRUE), 
+                           .SDcols = patterns("^(id|polity)$|^res")
+  ][, `:=`(goverment_type = fifelse(polity < PolityChangeValue, "Low Democracy", "High Democracy"),
+           polity = NULL,
+           Response = sub("^res_","",Response) |> str_to_title())
+  ][, specify(.SD,
+              formula = Happen ~ goverment_type, 
+              success = "TRUE") |>
+      generate(reps = 1000, type = "bootstrap") |>
+      calculate(stat = "ratio of props", 
+                order = c("High Democracy", "Low Democracy")) |>
+      as.data.table() |>
+      DT(j = stat := log2(stat)) |>
+      get_ci(type = "percentile"),
+    by = "Response"
+  ][, Response := fct_reorder(Response, upper_ci, sum)]
+
+
+ggplot(ResposeVsGovermentType, aes(y = Response))+
   geom_errorbarh(aes(xmin = lower_ci, xmax = upper_ci), 
-                 height = 0.5, size = 0.5)+
-  geom_point(size = 4, color = "dodgerblue3")+
-  geom_vline(aes(xintercept = 1), size = 1)+
+                 height = 0.3, size = 0.8,
+                 color = "dodgerblue3")+
+  geom_vline(aes(xintercept = 0), size = 1)+
   
   scale_x_continuous(breaks = breaks_width(0.2))+
   scale_color_manual(values = c("FALSE" = "dodgerblue3", 
                                 "TRUE" = "brown2"))+
   labs(title = "State Response vs Polity Level",
        y = "State Response", 
-       x = "Ratio of High / Low democracy level")+
-  theme(panel.grid.major.x = element_blank(),
+       x = "Log odds ratio of High / Low polity level")+
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank(),
         legend.position = "top")
   
 
 ```
 
-### How does it influence if the protest was violent?
+After calculating confidence intervals using the bootstrap technique we can conclude that the proportion of protests that result in state **ignore** and **accommodation** is significant higher in democratic countries than autocratic ones.
+
+On the other hand, the proportion of protests that result in state **crowd dispersal**, **arrest**, **killing**, **shooting** and **beating** is significant higher in autocratic countries than democratic ones.
+
+But, can this results change by taking in consideration if the protesters present violent during the protest?
 
 ```{r}
 
 set.seed(2022)
 
-ProtestLocationExtracted[!is.na(polity), 
-                         melt(.SD, 
-                              id.vars = c("id","polity","protesterviolence"),
-                              value.name = "Happen",
-                              variable.name = "Response",
-                              na.rm = TRUE), 
-                         .SDcols = patterns("^(id|polity|protesterviolence)$|^res")
-][, `:=`(goverment_type = fifelse(polity < PolityChangeValue, "Low Democracy", "High Democracy"),
-         polity = NULL,
-         Response = sub("^res_","",Response) |> str_to_title())
-][, specify(.SD,
-            formula = Happen ~ goverment_type, 
-            success = "TRUE") |>
-    generate(reps = 1000, type = "bootstrap") |>
-    calculate(stat = "ratio of props", 
-              order = c("High Democracy", "Low Democracy")) |>
-    (\(DF) DF$stat)() |>
-    get_percentile_ci(),
-  by = c("Response","protesterviolence")
-][, Response := fct_reorder(Response, point_estimate, sum)] |>
-  ggplot(aes(point_estimate , Response))+
-  geom_errorbarh(aes(xmin = lower_ci, xmax = upper_ci), 
-                 height = 0.5, size = 0.5)+
-  geom_point(aes(color = protesterviolence),size = 4)+
-  geom_vline(aes(xintercept = 1), size = 1)+
-  facet_wrap(~protesterviolence, nrow = 1)+
+ResposeVsGovermentTypeViolence <-
+  ProtestLocationExtracted[!is.na(polity), 
+                           melt(.SD, 
+                                id.vars = c("id","polity","protesterviolence"),
+                                value.name = "Happen",
+                                variable.name = "Response",
+                                variable.factor = FALSE,
+                                na.rm = TRUE), 
+                           .SDcols = patterns("^(id|polity|protesterviolence)$|^res")
+  ][, `:=`(goverment_type = fifelse(polity < PolityChangeValue, "Low Democracy", "High Democracy"),
+           polity = NULL,
+           Response = sub("^res_","",Response) |> str_to_title())
+  ][, specify(.SD,
+              formula = Happen ~ goverment_type, 
+              success = "TRUE") |>
+      generate(reps = 1000, type = "bootstrap") |>
+      calculate(stat = "ratio of props", 
+                order = c("High Democracy", "Low Democracy")) |>
+      as.data.table() |>
+      DT(j = stat := log2(stat)) |>
+      get_ci(type = "percentile"),
+    by = c("Response", "protesterviolence")
+  ][, Response := fct_reorder(Response, upper_ci, sum)]
+
+
+ggplot(ResposeVsGovermentTypeViolence, aes(y = Response))+
+  geom_errorbarh(aes(xmin = lower_ci, xmax = upper_ci,
+                     color = protesterviolence), 
+                 height = 0.3, size = 0.8)+
+  geom_vline(aes(xintercept = 0), size = 1)+
+  facet_wrap(~protesterviolence, ncol = 1)+
   scale_x_continuous(breaks = breaks_width(0.2))+
   scale_color_manual(values = c("FALSE" = "dodgerblue3", 
                                 "TRUE" = "brown2"))+
   labs(title = "State Response vs Polity Level",
        y = "State Response", 
-       x = "Ratio of High / Low democracy level")+
-  theme(panel.grid.major.x = element_blank(),
+       x = "Log odds ratio of High / Low polity level",
+       color = "Protester Violence")+
+  theme(panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
         panel.grid.minor.x = element_blank(),
+        strip.background = element_blank(),
+        strip.text = element_blank(),
         legend.position = "top")
   
 
 ```
 
+When protesters don't present violence the conclusions are the same, but when they present violence during protests state **ignore** and **accommodation** it's independent to the government type. We also can see a **Simpson's Paradox** in **crowd dispersal** and **arrest** as democratic countries has a significant higher proportion of protests with these response. To solve this problem we will need to use statistical modeling before getting our final conclusions.
 
+### How many people attent to protests according to each demand?
+
+(This chart would be more easier if participants_category were numeric)
+
+```{r}
+ProtestLocationExtracted[!is.na(participants_category),
+                         melt(.SD, 
+                                id.vars = c("id","participants_category"),
+                                value.name = "Happen",
+                                variable.name = "Demand",
+                                variable.factor = FALSE,
+                                na.rm = TRUE), 
+                         .SDcols = patterns("^(id|participants_category)$|^dem_")
+][Happen == TRUE,
+  .(N = uniqueN(id)),
+  by = .(Demand = sub("^dem_","",Demand) |> str_to_title(),
+         participants_category)
+][, prop := N / sum(N),
+  by = "Demand"] |>
+  ggplot(aes(prop, Demand))+
+  geom_col()+
+  facet_wrap(~participants_category)
+```
 
 
 - Adding text to identify each side meaning

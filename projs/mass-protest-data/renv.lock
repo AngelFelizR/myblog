@@ -222,10 +222,15 @@
     },
     "data.table": {
       "Package": "data.table",
-      "Version": "1.14.6",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "aecef50008ea7b57c76f1cb5c127fb02",
+      "Version": "1.14.7",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "Rdatatable",
+      "RemoteRepo": "data.table",
+      "RemoteRef": "master",
+      "RemoteSha": "cb8aeff9453acec878e5ab8515cda0d302c943eb",
+      "Hash": "e28f9bf8057550c163759b71e0740e88",
       "Requirements": []
     },
     "datawizard": {
