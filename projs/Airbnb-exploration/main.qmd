@@ -1,0 +1,232 @@
+---
+title: "Encontrando los mejores precios de Airbnb República Dominicana"
+author: "Angel Feliz"
+date: "2023-02-24"
+execute:
+  echo: true
+  message: false
+  warning: false
+format: 
+  html:
+    fig-width: 12
+    fig-height: 8
+    fig-align: "center"
+    toc: true
+    toc-title: Index
+    toc-location: left
+    self-contained: true
+    number-sections: true
+    smooth-scroll: true
+image: "airbnb-logo.png"
+categories: [Data Cleaning, Text Mining]
+---
+
+<style>
+
+code{color: #0c5bd1;}
+
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+}
+
+</style>
+
+# Introduction {.unnumbered}
+
+Airbnb es una empresa 
+
+<img src="airbnb-logo.png" class="center">
+
+
+# Exploracion
+
+
+## Librarias utilizadas
+
+
+```{r libraries-importation}
+
+if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+renv::restore()
+
+library(data.table)
+library(lubridate)
+
+library(ggplot2)
+library(scales)
+library(forcats)
+
+theme_set(theme_light())
+
+glimpse <- pillar::glimpse
+here <- here::here
+read_excel <- readxl::read_excel
+
+source("R/fixed-values.R")
+
+```
+
+
+## Datos a explorar
+
+
+```{r main-data-importation}
+
+AirbnbData <-
+  read_excel(here("Raw-data/Datos Airbnb.xlsx"),
+             skip = 2,
+             col_names = ColNames) |>
+  as.data.table() |>
+  DT(j = `:=`(fecha = as_date(fecha),
+              year = year(fecha),
+              month = format(fecha, "%m")))
+
+glimpse(AirbnbData)
+
+```
+
+## Precios según tipo de propiedad
+
+```{r}
+
+AirbnbPrecios <-
+  AirbnbData[, .SD, .SDcols = !patterns("hab$|fecha|promedio$")
+  ][, melt(.SD, 
+           measure.vars = patterns("^precio"),
+           variable.name = "tipo",
+           variable.factor = FALSE,
+           value.name = "precio")
+  ][, `:=`(tipo = sub(pattern = "^precio_", 
+                      replacement = "", 
+                      x = tipo),
+           provincia = fct_relevel(provincia, "Santo Domingo"))]
+
+```
+
+
+### Modelo de datos
+
+```{r}
+set.seed(2018)
+
+BootModelos <-
+  AirbnbPrecios[, rsample::bootstraps(.SD, times = 1000),
+                by = "tipo"
+  ][, .(model = .(lm(precio ~ ., data = splits[[1]]))),
+                by = c("tipo","id")]
+
+```
+
+Según podemos ver más abajo en general los modelos lineales pueden explicar mucha de la variabilidad de los precios.
+
+```{r}
+BootSummary <-
+  BootModelos[, broom::glance(model[[1]]),
+              by = c("tipo","id")]
+
+
+ggplot(copy(BootSummary)[, tipo := 
+                           fct_reorder(tipo, adj.r.squared)],
+       aes(adj.r.squared, tipo))+
+  geom_boxplot()+
+  geom_vline(aes(xintercept = 0))+
+  scale_x_continuous(labels = percent_format(accuracy = 1),
+                     breaks = breaks_width(0.1))+
+  expand_limits(x = 0)
+
+```
+
+¿Cuales son los factores que afecan el modelo y de que manera?
+
+```{r}
+BootCoef <-
+  BootModelos[, broom::tidy(model[[1]]),
+              by = c("tipo","id")]
+
+
+BootCoef[!is.na(estimate), 
+         .(lower = quantile(estimate, 0.025),
+           median = median(estimate),
+           upper = quantile(estimate, 0.975)),
+         by = c("tipo","term")
+][, significativo := 
+    fcase(0 >= lower & 0 <= upper,
+          "No effect",
+          0 < lower,
+          "Positive effect",
+          0 > upper,
+          "Negative effect") |>
+    factor(levels = c("No effect", 
+                      "Negative effect",
+                      "Positive effect"))] |>
+  ggplot(aes(tipo, term, fill = significativo))+
+  geom_tile(color = "white")+
+  scale_fill_manual(values = c("Positive effect" = "lightblue",
+                               "Negative effect" = "lightcoral",
+                               "No effect" = "lightgrey"))+
+  theme_classic()+
+  theme(axis.line = element_blank())
+
+```
+
+
+### Compartiendo resultados
+
+1. La rentas estan aumentando cada año
+
+```{r}
+PreciosYear <-
+  AirbnbPrecios[, .(median_precio = median(precio, na.rm = TRUE)),
+                by = c("tipo","year")
+  ][median_precio > 0]
+
+
+PreciosYearPlot <-
+  ggplot(PreciosYear,
+         aes(year, median_precio))+
+  geom_line(aes(group = tipo),
+            color = "lightgrey")+
+  geom_point(aes(text = paste0(tipo,": ",
+                               dollar(median_precio, accuracy = 1))),
+             color = "lightgrey")+
+  geom_smooth(method = "lm", 
+              se = FALSE,
+              color = "lightcoral")+
+  geom_text(aes(label = tipo,
+                x = year +0.25), 
+            color = "lightgrey",
+            size = 3.5,
+            data = PreciosYear[year == max(year)])+
+  scale_y_log10(breaks = 10^(seq(1,5, by = 0.5)),
+                labels = dollar_format(accuracy = 1))+
+  expand_limits(x = max(PreciosYear$year)+1)+
+  labs(x = "Año", y = "Mediana del Precio")+
+  theme_classic()
+
+
+plotly::ggplotly(PreciosYearPlot, 
+                 tooltip = "text")
+```
+
+
+
+
+
+## Precios de las habitaciones
+
+```{r}
+AirbnbHabitaciones <-
+  melt(AirbnbData, 
+       id.vars = c("year","month","provincia"),
+       measure.vars = patterns(propiedades_activas = "^propiedades_activas_\\d",
+                               precio_promedio = "^precio_\\d"),
+       variable.name = "n_habitaciones",
+       variable.factor = FALSE
+  )[,n_habitaciones := as.integer(n_habitaciones)]
+
+```
+
+

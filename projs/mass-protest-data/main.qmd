@@ -1123,7 +1123,8 @@ ResposeVsGovermentType <-
                                 variable.factor = FALSE,
                                 na.rm = TRUE), 
                            .SDcols = patterns("^(id|polity)$|^res")
-  ][, `:=`(goverment_type = fifelse(polity < PolityChangeValue, "Low Democracy", "High Democracy"),
+  ][, `:=`(goverment_type = fifelse(polity < PolityChangeValue,
+                                    "Low Democracy", "High Democracy"),
            polity = NULL,
            Response = sub("^res_","",Response) |> str_to_title())
   ][, specify(.SD,
@@ -1177,8 +1178,10 @@ ResposeVsGovermentTypeViolence <-
                                 variable.name = "Response",
                                 variable.factor = FALSE,
                                 na.rm = TRUE), 
-                           .SDcols = patterns("^(id|polity|protesterviolence)$|^res")
-  ][, `:=`(goverment_type = fifelse(polity < PolityChangeValue, "Low Democracy", "High Democracy"),
+                           .SDcols = 
+                             patterns("^(id|polity|protesterviolence)$|^res")
+  ][, `:=`(goverment_type = fifelse(polity < PolityChangeValue, 
+                                    "Low Democracy", "High Democracy"),
            polity = NULL,
            Response = sub("^res_","",Response) |> str_to_title())
   ][, specify(.SD,
@@ -1236,11 +1239,12 @@ ProtestLocationExtracted[!is.na(participants_category),
   .(N = uniqueN(id)),
   by = .(Demand = sub("^dem_","",Demand) |> str_to_title(),
          participants_category)
-][, prop := N / sum(N),
-  by = "Demand"] |>
+][, `:=`(max_demand = max(N),
+         prop = N / sum(N)) ,
+  by = "Demand"
+][N == max_demand] |>
   ggplot(aes(prop, Demand))+
-  geom_col()+
-  facet_wrap(~participants_category)
+  geom_col(aes(fill = participants_category))
 ```
 
 
