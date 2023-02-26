@@ -26,3 +26,8 @@ ColNames <-
     'precio_unique', 
     'precio_b&b', 
     'precio_apartment')
+
+RedColor <- "#F08080"
+GreenColor <- "#4DC966"
+GreyColor <- "#E3E3E3"
+  

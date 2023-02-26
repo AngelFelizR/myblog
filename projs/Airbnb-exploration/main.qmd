@@ -55,15 +55,18 @@ renv::restore()
 library(data.table)
 library(lubridate)
 
+
 library(ggplot2)
 library(scales)
 library(forcats)
+library(plotly)
 
-theme_set(theme_light())
+theme_set(theme_classic())
 
 glimpse <- pillar::glimpse
 here <- here::here
 read_excel <- readxl::read_excel
+glue <- glue::glue
 
 source("R/fixed-values.R")
 
@@ -82,7 +85,8 @@ AirbnbData <-
   as.data.table() |>
   DT(j = `:=`(fecha = as_date(fecha),
               year = year(fecha),
-              month = format(fecha, "%m")))
+              month = factor(month.abb[month(fecha)],
+                             levels = month.abb)))
 
 glimpse(AirbnbData)
 
@@ -93,7 +97,7 @@ glimpse(AirbnbData)
 ```{r}
 
 AirbnbPrecios <-
-  AirbnbData[, .SD, .SDcols = !patterns("hab$|fecha|promedio$")
+  AirbnbData[, .SD, .SDcols = !patterns("activas_\\dhab$|fecha|promedio$")
   ][, melt(.SD, 
            measure.vars = patterns("^precio"),
            variable.name = "tipo",
@@ -164,18 +168,16 @@ BootCoef[!is.na(estimate),
                       "Positive effect"))] |>
   ggplot(aes(tipo, term, fill = significativo))+
   geom_tile(color = "white")+
-  scale_fill_manual(values = c("Positive effect" = "lightblue",
-                               "Negative effect" = "lightcoral",
-                               "No effect" = "lightgrey"))+
+  scale_fill_manual(values = c("Positive effect" = GreenColor,
+                               "Negative effect" = RedColor,
+                               "No effect" = GreyColor))+
   theme_classic()+
   theme(axis.line = element_blank())
 
 ```
 
 
-### Compartiendo resultados
-
-1. La rentas estan aumentando cada año
+### La rentas estan aumentando cada año
 
 ```{r}
 PreciosYear <-
@@ -184,36 +186,195 @@ PreciosYear <-
   ][median_precio > 0]
 
 
+PreciosYearCoef <-
+  PreciosYear |>
+  lm(formula = median_precio ~ year) |>
+  coef() 
+
+PreciosYearColor <-
+  fifelse(PreciosYearCoef[2] < 0,
+          GreenColor, RedColor)
+
+PreciosYearSentido <-
+  fifelse(PreciosYearCoef[2] < 0,
+          "disminuyen", "incrementan")
+
+
+PreciosYearTitle <-
+  glue("Los precios <span style='color:{PreciosYearColor};font-weight:bold'>{PreciosYearSentido}</span>",
+       " en promedio ",
+       "<span style='color:{PreciosYearColor};font-weight:bold'>",
+       PreciosYearCoef[2] |> abs() |> dollar(accuracy = 1),
+       "</span> cada año",
+       "<br><sup>Mediana del precio por cada tipo de propiedad y año</sup>")
+
+
 PreciosYearPlot <-
   ggplot(PreciosYear,
          aes(year, median_precio))+
   geom_line(aes(group = tipo),
-            color = "lightgrey")+
+            color = GreyColor)+
   geom_point(aes(text = paste0(tipo,": ",
-                               dollar(median_precio, accuracy = 1))),
-             color = "lightgrey")+
+                              dollar(median_precio, accuracy = 1))),
+             color = GreyColor, size = 0.75)+
   geom_smooth(method = "lm", 
               se = FALSE,
-              color = "lightcoral")+
+              lwd = 1,
+              color = fifelse(PreciosYearCoef[2] > 0,
+                              RedColor,
+                              GreenColor) )+
   geom_text(aes(label = tipo,
                 x = year +0.25), 
-            color = "lightgrey",
+            color = GreyColor,
             size = 3.5,
             data = PreciosYear[year == max(year)])+
-  scale_y_log10(breaks = 10^(seq(1,5, by = 0.5)),
+  scale_y_log10(breaks = breaks_log(7),
                 labels = dollar_format(accuracy = 1))+
   expand_limits(x = max(PreciosYear$year)+1)+
-  labs(x = "Año", y = "Mediana del Precio")+
   theme_classic()
 
 
-plotly::ggplotly(PreciosYearPlot, 
-                 tooltip = "text")
+ggplotly(PreciosYearPlot, tooltip = "text") |>
+  layout(title = list(text = PreciosYearTitle,
+                      xref="paper",
+                      x=0,
+                      font = list(size = 16)),
+         xaxis = list(title = list(text = "Año",
+                                   font = list(size = 14))),
+         yaxis = list(title = list(text = "Mediana del Precio",
+                                   font = list(size = 14))))
+  
+```
+
+### Explicando el efecto de la provincia
+
+```{r}
+
+PreciosProvincia <-
+  AirbnbPrecios[, .(median_precio = median(precio, na.rm = TRUE),
+                    tipos_no_disponibles = 
+                      unique(AirbnbPrecios$tipo) |> 
+                      sort() |> 
+                      setdiff(tipo[precio>0]) |>
+                      paste0(collapse = ", ")),
+                by = "provincia"
+  ][median_precio > 0
+  ][,`:=`(provincia = fct_reorder(provincia, median_precio, sum, .desc = TRUE),
+          lower_value = median_precio == min(median_precio))]
+
+
+PreciosProvinciaPlot <-
+  ggplot(PreciosProvincia,
+         aes(median_precio, provincia))+
+  geom_col(aes(fill = lower_value,
+               text = 
+                 fifelse(tipos_no_disponibles %like% "\\w",
+                         paste0("<br>Propiedades ausentes: ", 
+                                tipos_no_disponibles),
+                         "") |>
+                 paste0("Mediana: ", dollar(median_precio, accuracy = 1),
+                        next_line = _)))+
+  scale_fill_manual(values = c("TRUE" = GreenColor,
+                               "FALSE" = GreyColor))+
+  scale_x_continuous(breaks = breaks_width(200),
+                     labels = dollar_format(accuracy = 1))+
+  theme(legend.position = "none")
+
+
+PreciosProvinciaTitle <-
+  glue("<span style='color:{GreenColor};font-weight:bold'>",
+       PreciosProvincia[lower_value == TRUE, 
+                        as.character(provincia)],
+       "</span> tiene mediana de renta más baja")
+
+
+ggplotly(PreciosProvinciaPlot, tooltip = "text") |>
+  layout(title = list(text = PreciosProvinciaTitle,
+                      xref="paper",
+                      x=0,
+                      font = list(size = 16)),
+         xaxis = list(title = list(text = "Año",
+                                   font = list(size = 14))),
+         yaxis = list(title = list(text = "Provincias",
+                                   font = list(size = 14))))
 ```
 
 
+### El efecto de los meses
+
+```{r}
+
+BootCoef[!is.na(estimate) & term == "monthDec", 
+         .(lower = quantile(estimate, 0.025),
+           median = median(estimate),
+           upper = quantile(estimate, 0.975)),
+         by = c("tipo","term")
+][0 < lower | 0 > upper]
+
+ggplot(AirbnbPrecios[tipo == "unique"], 
+       aes(precio, month))+
+  geom_boxplot()
 
 
+PreciosMonthCoef <-
+  PreciosMonth |>
+  lm(formula = median_precio ~ month + 0) |>
+  coef() 
+
+PreciosYearColor <-
+  fifelse(PreciosYearCoef[2] < 0,
+          GreenColor, RedColor)
+
+PreciosYearSentido <-
+  fifelse(PreciosYearCoef[2] < 0,
+          "disminuyen", "incrementan")
+
+
+PreciosYearTitle <-
+  glue("Los precios <span style='color:{PreciosYearColor};font-weight:bold'>{PreciosYearSentido}</span>",
+       " en promedio ",
+       "<span style='color:{PreciosYearColor};font-weight:bold'>",
+       PreciosYearCoef[2] |> abs() |> dollar(accuracy = 1),
+       "</span> cada año",
+       "<br><sup>Mediana del precio por cada tipo de propiedad y año</sup>")
+
+
+PreciosYearPlot <-
+  ggplot(PreciosYear,
+         aes(year, median_precio))+
+  geom_line(aes(group = tipo),
+            color = GreyColor)+
+  geom_point(aes(text = paste0(tipo,": ",
+                              dollar(median_precio, accuracy = 1))),
+             color = GreyColor, size = 0.75)+
+  geom_smooth(method = "lm", 
+              se = FALSE,
+              lwd = 1,
+              color = fifelse(PreciosYearCoef[2] > 0,
+                              RedColor,
+                              GreenColor) )+
+  geom_text(aes(label = tipo,
+                x = year +0.25), 
+            color = GreyColor,
+            size = 3.5,
+            data = PreciosYear[year == max(year)])+
+  scale_y_log10(breaks = breaks_log(7),
+                labels = dollar_format(accuracy = 1))+
+  expand_limits(x = max(PreciosYear$year)+1)+
+  theme_classic()
+
+
+ggplotly(PreciosYearPlot, tooltip = "text") |>
+  layout(title = list(text = PreciosYearTitle,
+                      xref="paper",
+                      x=0,
+                      font = list(size = 16)),
+         xaxis = list(title = list(text = "Año",
+                                   font = list(size = 14))),
+         yaxis = list(title = list(text = "Mediana del Precio",
+                                   font = list(size = 14))))
+  
+```
 
 ## Precios de las habitaciones
 
