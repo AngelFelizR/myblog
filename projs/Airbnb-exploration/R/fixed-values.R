@@ -29,5 +29,5 @@ ColNames <-
 
 RedColor <- "#F08080"
 GreenColor <- "#4DC966"
-GreyColor <- "#E3E3E3"
+GreyColor <- "#AAAAAA"
   
