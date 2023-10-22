@@ -1,8 +1,8 @@
 project:
   type: website
+  output-dir: docs
   resources:
     - "00-Angel-Feliz-Resume.pdf"
-    - "CNAME"
 
 website:
   title: "Angel Feliz"
