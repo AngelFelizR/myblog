@@ -2,7 +2,6 @@
 title: "The Art of Readiable R code"
 author: "Angel Feliz"
 date: "14 December 2022"
-editor: source
 format: 
   html:
     fig-width: 12

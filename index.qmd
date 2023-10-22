@@ -1,20 +1,31 @@
 ---
-title: "About"
+title: "Angel Feliz"
 image: profile.jpg
 about:
-  template: jolla
+  template: trestles
   links:
-    - icon: twitter
-      text: Twitter
-      href: https://twitter.com/angel_feliz_f
-    - icon: linkedin
-      text: LinkedIn
-      href: https://do.linkedin.com/in/angel-esteban-feliz-ferreras
-    - icon: github
-      text: Github
-      href: https://github.com/AngelFelizR/
-
+    - text: LinkedIn
+      url: "https://do.linkedin.com/in/angel-esteban-feliz-ferreras"
+    - text: Twitter
+      icon: twitter
+      url: "https://twitter.com/angel_feliz_f"
+    - text: Mastodon
+      icon: mastodon
+      url: "https://fosstodon.org/@AngelFelizF"
+    - text: GitHub
+      icon: github
+      url: "https://github.com/mikemahoney218"
+    - text: Email
+      url: "mailto:angel.esteban.feliz@gmail.com"
+    - text: Blog
+      url: "blog.html"
+    - text: CV
+      url: "00-Angel-Feliz-Resume.pdf"
+comments: false
 ---
+::: {.column-page}
+
+## Bio
 
 Senior Reporting Analyst with 2 years’ experience using R to process and create business reports in formats as Excel, Word, Power Point, and html. 
 

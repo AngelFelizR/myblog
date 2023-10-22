@@ -1,28 +1,35 @@
 project:
   type: website
-  output-dir: docs
+  resources:
+    - "00-Angel-Feliz-Resume.pdf"
 
 website:
   title: "Angel Feliz"
+  site-url: https://angelfeliz.com
+  description: "Personal blog related to R and Data Science"
+  open-graph:
+    locale: en_US
+  twitter-card:
+    creator: "@Angel_Feliz_F"
+  comments:
+    utterances:
+      repo: AngelFelizR/myblog
   navbar:
     left:
-      - href: projects.qmd
-        text: Projects
-      - href: about.qmd
+      - href: posts.qmd
         text: Blog
+      - icon: mastodon
+        href: https://fosstodon.org/@AngelFelizF
       - icon: github
         href: https://github.com/AngelFelizR/
       - icon: twitter
         href: https://twitter.com/angel_feliz_f
       - icon: linkedin
         href: https://do.linkedin.com/in/angel-esteban-feliz-ferreras
-      
+
 format:
   html:
-    theme: cosmo
-    css: styles.css
-
+    theme: [sandstone, _variables.scss]
+    css: styles.css   
+   
 editor: source
-
-resources:
-  - CNAME
