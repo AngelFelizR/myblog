@@ -11,10 +11,6 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Create CNAME
-        run: |
-          echo angelfeliz.com > docs/CNAME
-        
       - name: Check out repository
         uses: actions/checkout@v4
 
@@ -30,10 +26,9 @@ jobs:
         uses: r-lib/actions/setup-renv@v2
         with:
           cache-version: 1
-
+          
       - name: Render and Publish
-        uses: quarto-dev/quarto-actions/publish@v2
-        with:
-          target: gh-pages
+        uses: quarto-dev/quarto-actions/render@v2
+        
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
