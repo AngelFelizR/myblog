@@ -1,7 +1,7 @@
 ---
 title: "The Art of Readiable R code"
 author: "Angel Feliz"
-date: "14 December 2022"
+date: "2023-10-22"
 format: 
   html:
     fig-width: 12
