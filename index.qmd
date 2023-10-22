@@ -5,6 +5,7 @@ about:
   template: trestles
   links:
     - text: LinkedIn
+      icon: linkedin
       url: "https://do.linkedin.com/in/angel-esteban-feliz-ferreras"
     - text: Twitter
       icon: twitter
@@ -14,9 +15,7 @@ about:
       url: "https://fosstodon.org/@AngelFelizF"
     - text: GitHub
       icon: github
-      url: "https://github.com/mikemahoney218"
-    - text: Email
-      url: "mailto:angel.esteban.feliz@gmail.com"
+      url: "https://github.com/AngelFelizR"
     - text: CV
       url: "00-Angel-Feliz-Resume.pdf"
 comments: false

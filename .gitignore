@@ -4,6 +4,8 @@
 .httr-oauth
 .DS_Store
 /.quarto/
+/_site/
+/_freeze/
 docs
 *.html
 *_notes_files/
