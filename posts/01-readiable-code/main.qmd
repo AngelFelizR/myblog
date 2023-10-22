@@ -14,7 +14,7 @@ format:
     number-sections: true
     smooth-scroll: true
 image: "readability-tests.png"
-categories: [Tutorial]
+categories: [Code Style, R]
 ---
 
 <style>
