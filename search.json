@@ -1,12 +1,5 @@
 [
   {
-    "objectID": "posts.html",
-    "href": "posts.html",
-    "title": "Posts",
-    "section": "",
-    "text": "The Art of Readiable R code\n\n\n\n\n\n\n\nTutorial\n\n\n\n\n\n\n\n\n\n\n\nOct 22, 2023\n\n\nAngel Feliz\n\n\n\n\n\n\nNo matching items"
-  },
-  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "Angel Feliz",
@@ -19,6 +12,13 @@
     "title": "Angel Feliz",
     "section": "",
     "text": "Senior Reporting Analyst with 2 years’ experience using R to process and create business reports in formats as Excel, Word, Power Point, and html.\nProven experience integrating ad hoc regular expressions to transform, extract and validate text data in data pipelines to find abnormalities and automate repetitive tasks; improving reporting accuracy, reducing waiting times and opening new possibilities to empower decision makers.\nAutodidactic, self-motivated, inquisitive, and eager to apply data science techniques to create business value and increase ROI for your company"
+  },
+  {
+    "objectID": "posts.html",
+    "href": "posts.html",
+    "title": "Posts",
+    "section": "",
+    "text": "The Art of Readiable R code\n\n\n\n\n\n\n\nCode Style\n\n\nR\n\n\n\n\n\n\n\n\n\n\n\nOct 22, 2023\n\n\nAngel Feliz\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/01-readiable-code/main.html",
