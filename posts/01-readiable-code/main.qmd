@@ -13,7 +13,7 @@ format:
     self-contained: true
     number-sections: true
     smooth-scroll: true
-image: "pexels-antonio-batinić-4164418.jpg"
+image: "readable-code-bing.jfif"
 categories: [Good Practices, Coding Style]
 ---
 
@@ -25,7 +25,7 @@ But the problems start when you need to modify a script that you wrote 6 months 
 
 As a Reporting Analyst and I am always creating and changing scripts and after applying the tips provided in **The Art of Readable Code** by *Dustin Boswell* and *Trevor Foucher* I could reduce the time needed to apply changes from 5 to 2 days (60% faster).
 
-![By: Antonio Batinić](pexels-antonio-batinić-4164418.jpg)
+![](readable-code-bing.jfif)
 
 # How do you know if your code is readable?
 
@@ -63,7 +63,7 @@ To write good variable names might take some iteration and you might need to pla
 :::
 
 
-#### Coding Example
+**Coding Example**
 
 Let's apply these points to the `mtcars`.
 
@@ -115,7 +115,7 @@ Creating explicit functions names can transform a **complex process into a simpl
 |begin and end| Useful to denominate either inclusive or exclusive limits|
 
 
-#### Coding Example
+**Coding Example**
 
 ```{r}
 
@@ -166,7 +166,7 @@ Writing good comments can be challenging, so you better do it in 3 steps:
 
 :::
 
-#### Coding Example
+**Coding Example**
     
 Let's comment our custom function to explain each point.
     
