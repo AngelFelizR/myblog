@@ -13,73 +13,62 @@ format:
     self-contained: true
     number-sections: true
     smooth-scroll: true
-image: "readability-tests.png"
-categories: [Code Style, R]
+image: "pexels-antonio-batinić-4164418.jpg"
+categories: [Good Practices, Coding Style]
 ---
-
-<style>
-
-code{color: #0c5bd1;}
-
-.center {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 50%;
-}
-
-</style>
 
 # Introduction {.unnumbered}
 
-When we start our journey as a programmers it's normal to get exited by the new positives. We get the capacity to do many things that otherwise would be impossible, making projects faster and assuring consistency.
+When we start our journey as programmers it's normal to get excited by the new possibilities. We get the capacity to do many things that otherwise would be impossible, making projects faster and assuring consistency.
 
-But the problems start when you need to modify a script that you wrote 6 months in the past. That's when you found out that you don't remember why you were applying some specific filters or calculating a value in a odd way.
+But the problems start when you need to modify a script that you wrote 6 months ago. That's when you find out that you don't remember why you were applying some specific filters or calculating a value in a odd way.
 
 As a Reporting Analyst and I am always creating and changing scripts and after applying the tips provided in **The Art of Readable Code** by *Dustin Boswell* and *Trevor Foucher* I could reduce the time needed to apply changes from 5 to 2 days (60% faster).
 
-![From: https://uxmastery.com/wp-content/uploads/2013/09/readability-tests.png](readability-tests.png)
+![By: Antonio Batinić](pexels-antonio-batinić-4164418.jpg)
 
 # How do you know if your code is readable?
 
-In order a code to be readable needs to:
+In order for a code to be readable, it needs to:
 
-1. Have explicit names for variables, functions and function arguments.
+1. Have **explicit names** for variables, functions and function arguments.
 
-2. Have commentaries that explain the reasons behind the code. At the end, the reader should know as much as the writer did.
+2. Have **comments that explain the reasons behind the code**. At the end, the reader should know as much as the writer did.
 
-3. Be understood without reading it twice.
+3. **Be understood without reading it twice**.
 
 
 # Practical Tecniques
 
-Once we know what we want to achieve it results really useful to know some techniques that might help us for that purpose. In this article, we will use `R` to make all the our examples and the `datasets::mtcars` data.frame as it is widely use for simple examples.
+Once we know what we want to achieve, it is really useful to know some techniques that might help us for that purpose. In this article, we will use `R` to make all the our examples and the `datasets::mtcars` data.frame as it is widely used for simple examples.
 
-## Naming variables
+## Creating explicit names
 
-Defining good variables names in general is more important than writing a good comment and should try to give as much context as possible in variable name. Some tips to follow are:
+### Naming variables
 
-1. Variable should be named base on its value. 
-    - Words like *is*, *has* and *should* make clearer a Boolean variables by avoiding negations.
-    - Looping index can be identify by using a suffix, for example: club_i or table_i rather just i
+**Defining good variable names is more important than writing a good comment** and we should try to give as much context as possible in the variable name. To make this possible:
 
-2. If the variable has a measurement we can use suffixes to make it explicit.
+1. **Name based on variable value**. 
+    - **Boolean variables** can use words like *is*, *has* and *should* avoid negations. For example: `is_integer`, `has_money` and `should_end`.
+    - **Looping index** can have a name followed by the the suffix *i*. For example: `club_i`  and `table_i`.
+
+2. **Add dimensions unit** a suffix. For example: `price_usd`, `mass_kg` and `distance_miles`.
   
-3. A variable should remain the same value across the project. 
-    - If a variable is changed in many stages the variable name should show the current stage.
-    - If you need to create many temporal intermediate variables to get a final resulta it's better to write a function.
+3. **Never change the variable’s value** in different sections, instead create a new variable making explicit the change in the name. For example, we can have the variable `price`and latter we can create the variable `price_discount`.
 
-If we run `?mtcars` in the `R` console we can see a description of each variable in the `mtcars` dataset. After reading each column description it is easy to understand each column name, but it is almost impossible to understand what each variable contains by just reading each column name. Let's see two examples:
+::: {.callout-note}
 
-- **mpg**: In this case, *m* means *miles*, *p* means *per* and *g* means *gallons*. It isn't explicit, *m* could mean meters or any other thing. It could be obvious for some with car a basic knowledge, but for many people the meaning of variable could be confusing. To fix this problems let's write word completely.
+To write good variable names might take some iteration and you might need to play devil's advocate in under to find out a better name than the initial one.
 
-- **cyl**: It stands for first 3 letters of cylinder, but no all readers will understand that, so it is better to write the complete word and add the unit used.
+:::
 
-Once understand the point, we can create a new `data.frame` applying tips mencined.
+
+#### Coding Example
+
+Let's apply these points to the `mtcars`.
 
 ```{r}
-
-MtCarsNewNames <-
+mtcars_new_names <-
   c("mpg" = "miles_per_gallon",
     "cyl"= "cylinders_count",
     "disp" = "displacement_in3",
@@ -92,22 +81,18 @@ MtCarsNewNames <-
     "gear" = "gear_count",
     "carb" = "carburetor_count")
 
-MtCarsRenamed <- mtcars
-names(MtCarsRenamed) <- MtCarsNewNames[names(mtcars)]
+mtcars_renamed <- mtcars
+names(mtcars_renamed) <- mtcars_new_names[names(mtcars)]
 
-head(MtCarsRenamed)
+str(mtcars_renamed)
 
 ```
 
-As we changed the original data it is important to save a new variable specify how data change. In this case we just added the word **renamed** so `mtcars` will keep the same value across the project.
+### Defining functions
 
-To write good variable names might take some iteration and you might need to play devil's advocate in under to find out a better name than the initial one.
+Creating explicit functions names can transform a **complex process into a simple one**.
 
-## Naming functions and its arguments
-
-Creating explicit functions names makes much easier to understand any code. I could make a really complex process to become a very simple one. Some tips to follow are:
-
-1. Start the function with a explicit verb to avoid misunderstandings. Below we can see some recommendations from the book.
+1. **Start the function with an explicit verb** to avoid misunderstandings.
 
 | Word | Alternatives |
 |:----:|:-------------|
@@ -117,216 +102,208 @@ Creating explicit functions names makes much easier to understand any code. I co
 | make | create, set up, build, generate, compose, add, new |
 
 
-2. Avoid using abstract names that don't desecrate the output.
+2. The function name must **describe its output**.
 
-3. Some general recommendations for function arguments are:
+3. **A function should do only one thing**, otherwise break the functions in more simpler ones to keep the name explicit.
+
+4. Use the following words to define range arguments.
 
 | Word | Use|
 |:-----|:---|
-|min and max | Useful to denominate include limits|
+|min and max | Useful to denominate included limits|
 |first and last| Useful to denominate exclusive limits|
-|begin and end| Useful to denominate ether inconclusive or exclusive limits|
+|begin and end| Useful to denominate either inclusive or exclusive limits|
 
-For example, we want to create a function that filters the value over a specific percentile of any variable, we named a for example `filter_percentile`, but that could bring some confusion, some could understand that you will keep or remove all values equals to the percentile value. A better name can be `keep_over_percentile`.
+
+#### Coding Example
 
 ```{r}
 
-extract_over_percentile <- function(DF, variable, prob){
+keep_rows_in_percentile_range <- function(DF,
+                                          var_name,
+                                          min_prob,
+                                          max_prob){
   
-  DF[DF[[variable]] > quantile(DF[[variable]], na.rm = TRUE, probs = prob), ]
+  if(!is.data.frame(DF)) stop("DF should be a data.frame")
+  
+  values <- DF[[var_name]]
+  if(!is.numeric(values)) stop("var_name should be a numeric column of DF")
+  
+  min_value <- quantile(values, na.rm = TRUE, probs = min_prob)
+  max_value <- quantile(values, na.rm = TRUE, probs = max_prob)
+  
+  value_in_range <- 
+    values >= min_value & 
+    values <= max_value
+  
+  return(DF[value_in_range, ])
   
 }
-
-MtCarsRenamed |>
-  extract_over_percentile(variable = "miles_per_gallon", prob = 0.50) |>
-  nrow()
-
 ```
 
 
 ## Commenting correctly
 
-Writing good comments can be challenging as everything looks so clear when are writing code but here are some tips that might help you:
+The first step to have a commented project is to have a `README` file explaining how the code works in a way that to should be **enough to present the project to a new team member**, but it is also important to add comments to:
 
-1. Each project should have a README file an introduction to the code with important point that you would tell a new team member.
+1. Explain how **custom functions behave** in several situations with minimal examples.
 
-2. Some important topics to comment are:
-    * How a function behaves in some situations and also a good example.
-    * Why do we use certain method.
-    * Things that we couldn't solve and how we would do it.
-    * Explaining why do we use certain values in constants.
+2. Explain the **reasons behind the decisions** that have been taken related to coding style and business logic, like method and constant selection.
 
-3. If you are commenting to describe some code reading the comment should be faster than reading the code.
+3. Make **explicit pending problems** to solve and the initial idea we have to start the solution.
 
-4. Don’t comment bad names, fix them instead.
+4. **Avoid commenting bad names**, fix them instead.
 
-5. Write commentaries in 3 steps:
-    * Write down whatever comment is on your mind
-    * Read the comment and see what needs to be improved
-    * Make improvements
-   
+5. **Summarize coding sections** with a description faster to read than the original code.
+
+
+::: {.callout-note}
+
+Writing good comments can be challenging, so you better do it in 3 steps:
+1. Write down whatever comment is on your mind
+2. Read the comment and see what needs to be improved
+3. Make the needed improvements
+
+:::
+
+#### Coding Example
     
-Let's see a quick example here I clarify reasons behaind the code.
+Let's comment our custom function to explain each point.
     
 ```{r}
+# 1. Behavior
+# This function can filter the values of any  data.frame if the var_name
+# is numeric no matter if the column has missing values as it will omit them
 
-# Selecting cars with high energy efficiency as 
-# the final user doesn't care about car speed or power.
+# 2. Reasons behind decisions
+# As we are not expecting to make inferences imputation is not necessary.
 
-EffientCars <-
-  MtCarsRenamed[order(-MtCarsRenamed$miles_per_gallon), 
-                c("miles_per_gallon", 
-                  "transmission_is_manual",
-                  "engine_is_straight")] |>
-  extract_over_percentile(variable = "miles_per_gallon", prob = 0.75)
+keep_rows_in_percentile_range <- function(DF,
+                                          var_name,
+                                          min_prob,
+                                          max_prob){
 
+  # 5. Reading the code is faster than reading a comment, so we don't need it
+  if(!is.data.frame(DF)) stop("DF should be a data.frame")
+
+  # 2. Reasons behind decisions
+  # We are going to use this vector many times and 
+  # saving it as a variable makes the code much easier to read
+  values <- DF[[var_name]]
+  
+  # 5. Reading the code is faster than reading a comment, so we don't need it
+  if(!is.numeric(values)) stop("var_name should be a numeric column of DF")
+  
+  # 2. Reasons behind decisions
+  # Even though a single quantile call could return both values in a vector
+  # it is much simpler to understand if we save each value in a variable
+  min_value <- quantile(values, na.rm = TRUE, probs = min_prob)
+  max_value <- quantile(values, na.rm = TRUE, probs = max_prob)
+  
+  # 4. The boolean test has an explicit name
+  value_in_range <- 
+    values >= min_value & 
+    values <= max_value
+  
+  return(DF[value_in_range, ])
+  
+}
 ```
     
     
 ## Code style
 
-Code style is important as it allows you to scan quickly many lines of code before reading the detail of each line. Some advice to improve code style are:
+It is important to apply a coding style that make easy to **scan the code** before going into detail to certain parts. Some advice to improve code style are:
 
-1. Ensure that similar code looks similar, it might help you to identify important spelling mistakes.
+1. **Similar code** should **look similar** and **be grouped in blocks**, it will facilitate finding spelling mistakes and prevent repetitive comments.
 
-2. Complete all the process you need to do related to one task before moving to other. For example, import all your data before applying changes and transform all your data before exporting reports. The function `source` it's very useful if we want to break log code into main parts.
-
-3. Avoid repetitive comments, instead divide your code into blocks with comments.
-
-4. Use `|>` from base R or `%>%` from magrittr package to avoid creating temporal variable without losing readability.
-
-5. When making `TRUE` or `FALSE` test it useful to store the result in a variable with a explicit of what was the test about.
-
-```{r}
-
-HasMoreThan5Cars <- nrow(EffientCars) > 5
-
-if(HasMoreThan5Cars) EffientCars
-
-```
-
-
-6. Write constants on the right side of the Boolean test.
+We can see how this tips was applied in the `keep_rows_in_percentile_range` function.
 
 ```{r}
 #| eval: false
 
-# It's better to write
-nrow(EffientCars) > 5
-
-# Than writing
-5 <= nrow(EffientCars)
+min_value <- quantile(values, na.rm = TRUE, probs = min_prob)
+max_value <- quantile(values, na.rm = TRUE, probs = max_prob)
 
 ```
 
+2. **Avoid keeping temporal variables** in the global environment `.GlobalEnv`, instead create a function to make clear the purpose or use pipes (`base::|>` or `magrittr::%>%`).
 
-7. Avoid writing nested if stamens, instead try to negate each Boolean test.
+To ensure this, we created our custom function.
+
+```{r}
+mtcars_renamed |>
+  keep_rows_in_percentile_range(var_name = "miles_per_gallon", 
+                                min_prob = 0.20,
+                                max_prob = 0.50) |>
+  nrow()
+```
+
+
+3. **Avoid writing nested `if` statements** by negating each Boolean test.
+
+If we hadn’t taken that into consideration our function would be much harder to read.
 
 ```{r}
 #| eval: false
 
-# it's better to write
-extract_over_percentile <- function(DF, variable, prob){
-  
-  if(!is.data.frame(DF)) stop("DF must be a data.frame")
-  if(typeof(variable) != "character") stop("variable must be a character")
-  if(!is.numeric(DF[[variable]])) stop(paste0(variable, " must be a character"))
-  if(typeof(prob) != "double") stop("prob must be a double")
-  if(!all(prob > 0 & prob < 1)) stop("prob must be in range (0,1)")
-  
-  DF[DF[[variable]] > quantile(DF[[variable]], na.rm = TRUE, probs = prob), ]
-  
-}
-
-
-# Than writing
-extract_over_percentile <- function(DF, variable, prob){
+keep_rows_in_percentile_range <- function(DF,
+                                          var_name,
+                                          min_prob,
+                                          max_prob){
   
   if(is.data.frame(DF)){
     
-    if(typeof(variable) == "character"){
+    values <- DF[[var_name]]
+    
+    if(is.numeric(values)){
       
-      if(is.numeric(DF[[variable]])){
-        
-        if(typeof(prob) == "double"){
-          
-          if(all(prob > 0 & prob < 1)){
-            
-   DF[DF[[variable]] > quantile(DF[[variable]], na.rm = TRUE, probs = prob), ]   
-            
-          }else{
-            stop("prob must be in range (0,1)")
-          }
-          
-        }else{
-          stop("prob must be a double")
-        }
-        
-      }else{
-        stop(paste0(variable, " must be a character")) 
-      }
+      min_value <- quantile(values, na.rm = TRUE, probs = min_prob)
+      max_value <- quantile(values, na.rm = TRUE, probs = max_prob)
+      
+      value_in_range <- 
+        values >= min_value & 
+        values <= max_value
+      
+      return(DF[value_in_range, ])
       
     }else{
-      stop("variable must be a character")
+      
+      stop("var_name should be a numeric column of DF")
+      
     }
-  }else{
-    stop("DF must be a data.frame")
-  }
 
+  }else{
+    
+    stop("DF should be a data.frame")
+    
+  }
+  
 }
 
 ```
 
+4. **Boolean validations should be stored in variables** should be stored variables to make explicit what was the test about.
 
-8. You can apply Morgan's Law if A and B are Boolean variables: **! ( A | B) == !A & !B**
+5. Always **write constants on the right** side of the comparison.
 
-9. If a function it's getting long, you can extract from the function one or more secondary functions that solve smaller problems.
+6. Simplify Boolean comparisons De Morgan’s Law: **! ( A | B) == !A & !B**
+
+In our custom function `min_value` and `max_value` works like constants in comparisons to `values`
 
 ```{r}
+#| eval: false
 
-# Creating validation functions
-
-validate_df <- function(DF){
-  if(!is.data.frame(DF)) stop("DF must be a data.frame")
-}
-
-validate_variable <- function(DF, variable){
-  if(typeof(variable) != "character") stop("variable must be a character")
-  if(!is.numeric(DF[[variable]])) stop(paste0(variable, " must be a character"))
-}
-
-validate_prob <- function(prob) {
-  if(typeof(prob) != "double") stop("prob must be a double")
-  if(!all(prob > 0 & prob < 1)) stop("prob must be in range (0,1)")
-  if(length(prob) != 1) stop("prob must have lenght == 1")
-}
-
-
-# Updating core function
-
-extract_over_percentile <- function(DF, variable, prob){
-  
-  validate_df(DF)
-  validate_variable(DF, variable)
-  validate_prob(prob)
-  
-  DF[DF[[variable]] > quantile(DF[[variable]], na.rm = TRUE, probs = prob), ]
-  
-}
-
-MtCarsRenamed[order(-MtCarsRenamed$miles_per_gallon), 
-              c("miles_per_gallon", 
-                "transmission_is_manual",
-                "engine_is_straight")] |>
-  extract_over_percentile(variable = "miles_per_gallon", prob = 0.75)
-
+value_in_range <- 
+  values >= min_value & 
+  values <= max_value
 
 ```
 
 # Conclusion {.unnumbered}
 
-Writing high quality code it's important, but it takes time and practice. At this point, I just want to share the next words by Hadley Wickham.
+Writing high quality code it's important, but it takes time and practice. At this point, I just want to share the following words by Hadley Wickham.
 
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">The only way to write good code is to write tons of shitty code first. Feeling shame about bad code stops you from getting to good code</p>&mdash; Hadley Wickham (@hadleywickham) <a href="https://twitter.com/hadleywickham/status/589068687669243905?ref_src=twsrc%5Etfw">April 17, 2015</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+> The only way to write good code is to write tons of shitty code first. Feeling shame about bad code stops you from getting to good code.
 
-I hope you have learnt something new that you find uselful.
+I hope you have learnt something new that you find useful.
