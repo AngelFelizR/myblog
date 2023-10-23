@@ -25,7 +25,7 @@ But the problems start when you need to modify a script that you wrote 6 months 
 
 As a Reporting Analyst and I am always creating and changing scripts and after applying the tips provided in **The Art of Readable Code** by *Dustin Boswell* and *Trevor Foucher* I could reduce the time needed to apply changes from 5 to 2 days (60% faster).
 
-![](readable-code-bing.jfif)
+![](readable-code-bing.jfif){width=65% height=45% fig-align="center"}
 
 # How do you know if your code is readable?
 
@@ -56,12 +56,6 @@ Once we know what we want to achieve, it is really useful to know some technique
   
 3. **Never change the variable’s value** in different sections, instead create a new variable making explicit the change in the name. For example, we can have the variable `price`and latter we can create the variable `price_discount`.
 
-::: {.callout-note}
-
-To write good variable names might take some iteration and you might need to play devil's advocate in under to find out a better name than the initial one.
-
-:::
-
 
 **Coding Example**
 
@@ -87,6 +81,12 @@ names(mtcars_renamed) <- mtcars_new_names[names(mtcars)]
 str(mtcars_renamed)
 
 ```
+
+::: {.callout-note}
+
+To write good variable names might take some iteration and you might need to play devil's advocate in under to find out a better name than the initial one.
+
+:::
 
 ### Defining functions
 
@@ -157,15 +157,6 @@ The first step to have a commented project is to have a `README` file explaining
 5. **Summarize coding sections** with a description faster to read than the original code.
 
 
-::: {.callout-note}
-
-Writing good comments can be challenging, so you better do it in 3 steps:
-1. Write down whatever comment is on your mind
-2. Read the comment and see what needs to be improved
-3. Make the needed improvements
-
-:::
-
 **Coding Example**
     
 Let's comment our custom function to explain each point.
@@ -209,6 +200,18 @@ keep_rows_in_percentile_range <- function(DF,
   
 }
 ```
+
+::: {.callout-note}
+
+Writing good comments can be challenging, so you better do it in 3 steps:
+
+1. Write down whatever comment is on your mind
+
+2. Read the comment and see what needs to be improved
+
+3. Make the needed improvements
+
+:::
     
     
 ## Code style
