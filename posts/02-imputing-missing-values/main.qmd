@@ -36,6 +36,9 @@ Let's assume that all the **predictors** for a machine learning model are stored
 To perform all the tasks needed to solve the missing values problems in our dataset, we will load the following packages:
 
 ```{r}
+#| message: false
+#| warning: false
+
 # For modeling and statistical analysis
 library(tidymodels)
 
