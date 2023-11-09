@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://angelfeliz.com/index.html</loc>
-    <lastmod>2023-10-23T11:33:29.981Z</lastmod>
+    <loc>https://angelfeliz.com/posts/02-imputing-missing-values/main.html</loc>
+    <lastmod>2023-11-09T17:21:35.721Z</lastmod>
   </url>
   <url>
     <loc>https://angelfeliz.com/posts.html</loc>
-    <lastmod>2023-10-23T11:33:24.373Z</lastmod>
+    <lastmod>2023-11-09T17:20:37.941Z</lastmod>
+  </url>
+  <url>
+    <loc>https://angelfeliz.com/index.html</loc>
+    <lastmod>2023-11-09T17:20:37.241Z</lastmod>
   </url>
   <url>
     <loc>https://angelfeliz.com/posts/01-readiable-code/main.html</loc>
-    <lastmod>2023-10-23T11:33:29.549Z</lastmod>
+    <lastmod>2023-11-09T17:20:41.553Z</lastmod>
   </url>
 </urlset>
