@@ -1,0 +1,61 @@
+---
+title: "We Can Measure (Estimate) Anything"
+author: "Angel Feliz"
+date: "2023"
+format: 
+  html:
+    fig-width: 12
+    fig-height: 8
+    fig-align: "center"
+    toc: true
+    toc-title: Index
+    toc-location: left
+    self-contained: true
+    number-sections: true
+    smooth-scroll: true
+image: "impute-example.png"
+categories: [Estimating, Business]
+---
+
+## Introduction
+
+Here is what we I learned by reading How to Measure Anything by DOUGLAS W. HUBBARD.
+
+## Lessions learned from 3 masters
+
+- Eratosthenes (ca. 276–194 b.c.) wrung more information out of the few **facts he could confirm** instead of assuming the hard way was the only way.
+
+- *Fermi decomposition* from Enrico Fermi (1901–1954) it is an assessment to **use what you already know about a problem** in such a way that it can get you in the ballpark.
+
+- Like Emily Rosa **try to answer a simpler, but related question**.
+
+## General misconceptions about measurement
+
+1. **Concept**: Measurement as concept is widely misunderstood.
+
+**Measurement**: A quantitatively expressed reduction of uncertainty based on one or more observations. The fact that some amount of error is unavoidable but can still be an improvement on prior knowledge is central to how experiments, surveys, and other
+scientific measurements are performed.
+
+Scales of measurement:
+
+- Nominal: there is no implicit order or sense of relative size.
+
+- Ordinal: Allow us to say one value is “more” than another,
+but not by how much (four-star rating or Mohs hardness scale).
+- Ratio: They can be added, subtracted, multiplied, and
+divided in a way that makes sense
+- Interval:
+
+2. **Object**: The thing being measured is not well defined.
+
+A problem well stated is a problem half solved.Charles Kettering (1876–1958)
+
+
+3. **Method**: Some methods of measurement are not well known.
+
+## Reasons why something shouldn’t be measured
+
+1. Any measurement would be too expensive.
+2. You can prove anything with statistics.
+3. We shouldn’t measure it because it would be immoral to measure it.
+
