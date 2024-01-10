@@ -19,9 +19,11 @@ categories: [Estimating, Business]
 
 ## Introduction
 
-Here is what we I learned by reading How to Measure Anything by DOUGLAS W. HUBBARD.
+In this post will summarize the lessons learn after reading **How to Measure Anything** by DOUGLAS W. HUBBARD.
 
-## Lessions learned from 3 masters
+## Be clever when measuring
+
+Here are some important examples from the history:
 
 - Eratosthenes (ca. 276–194 b.c.) wrung more information out of the few **facts he could confirm** instead of assuming the hard way was the only way.
 
@@ -29,33 +31,22 @@ Here is what we I learned by reading How to Measure Anything by DOUGLAS W. HUBBA
 
 - Like Emily Rosa **try to answer a simpler, but related question**.
 
-## General misconceptions about measurement
+## Defining measurement
 
-1. **Concept**: Measurement as concept is widely misunderstood.
+A **measurement** represent a quantitatively expressed **reduction of uncertainty** based on one or more observations.
 
-**Measurement**: A quantitatively expressed reduction of uncertainty based on one or more observations. The fact that some amount of error is unavoidable but can still be an improvement on prior knowledge is central to how experiments, surveys, and other
-scientific measurements are performed.
+So to perform a measurement you don't need to bring an exact value, instead we should bring a value with its **related error**. The uncertainty can be represented as a 95% confidence interval or a probability of something to happen.
 
-Scales of measurement:
+### Scales of measurement
 
-- Nominal: there is no implicit order or sense of relative size.
+It's important to know that there are different scales to perform a measurement:
 
-- Ordinal: Allow us to say one value is “more” than another,
-but not by how much (four-star rating or Mohs hardness scale).
-- Ratio: They can be added, subtracted, multiplied, and
-divided in a way that makes sense
-- Interval:
+- **Nominal**: They don't have an implicit order or sense of relative size.
 
-2. **Object**: The thing being measured is not well defined.
+- **Ordinal**: They allow us to say one value is “more” than another, but not by how much (four-star rating or Mohs hardness scale).
 
-A problem well stated is a problem half solved.Charles Kettering (1876–1958)
+- **Ratio**: They can be added, subtracted, multiplied, and
+divided in a way that makes sense.
 
-
-3. **Method**: Some methods of measurement are not well known.
-
-## Reasons why something shouldn’t be measured
-
-1. Any measurement would be too expensive.
-2. You can prove anything with statistics.
-3. We shouldn’t measure it because it would be immoral to measure it.
+- **Interval**: They are almost like ratio scales in that they have defined units but the “zero” is an arbitrary point, like the Celsius scale for temperature.
 
