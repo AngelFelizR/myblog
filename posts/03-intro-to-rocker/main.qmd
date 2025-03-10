@@ -1,0 +1,128 @@
+---
+title: "R + Docker: Configuración paso a paso para análisis de datos consistentes"
+author: "Angel Feliz"
+date: "2025-03-09"
+format: 
+  html:
+    fig-width: 12
+    fig-height: 8
+    fig-align: "center"
+    toc: true
+    toc-title: Index
+    toc-location: left
+    self-contained: true
+    number-sections: true
+    smooth-scroll: true
+image: "rocker-logo.png"
+categories: [Introduction to R]
+---
+
+El **lenguaje R** es ampliamente reconocido por su versatilidad en el análisis de datos, y aunque se puede instalar y ejecutar directamente R y RStudio en casi cualquier sistema, usar entornos basados en contenedores —como los que ofrece el [Rocker Project](https://rocker-project.org/)— nos brinda ventajas significativas a largo plazo.
+
+## R: Una herramienta excepcional para el análisis de datos
+
+R destaca por sus numerosas cualidades que lo hacen ideal para científicos de datos y analistas:
+
+- **Gratuito y de código abierto:** Permite el acceso libre a un ecosistema de paquetes y herramientas.
+- **Amplia variedad de herramientas:** Existen innumerables paquetes y librerías diseñados para tareas específicas de análisis, estadística y visualización.
+- **Fácil de aprender:** Su sintaxis y comunidad de apoyo facilitan el proceso de aprendizaje para nuevos usuarios.
+- **Multiplataforma:** Se ejecuta sin problemas en Windows, macOS y Linux.
+- **Comunidad activa:** La colaboración y el constante desarrollo impulsan la innovación y mejora continua del entorno.
+
+## La importancia de la reproducibilidad a lo largo del tiempo
+
+Cuando desarrollamos un programa en R, es fundamental que pueda ser reproducido incluso años después. Para lograrlo, es necesario garantizar:
+
+- **Consistencia del entorno:** Utilizar la misma versión del sistema operativo, de R y de los paquetes instalados.
+- **Prevención de incompatibilidades:** Las actualizaciones y cambios en el software pueden alterar el comportamiento del código.
+- **Verificación futura:** Asegurar que los análisis y resultados se puedan validar y comparar con versiones anteriores.
+- **Integridad en la investigación:** Una base reproducible es esencial para la honestidad y la claridad en la comunicación científica.
+
+## Ventajas de usar entornos de desarrollo en contenedores
+
+El uso de contenedores aporta un gran beneficio para la gestión y evolución de nuestros proyectos:
+
+- **Aislamiento:** El entorno de ejecución se mantiene separado del sistema operativo del host, evitando conflictos de dependencias.
+- **Portabilidad:** Un contenedor puede ser ejecutado en cualquier máquina que tenga Docker, sin necesidad de reconfigurar el entorno.
+- **Escalabilidad:** Es sencillo trasladar el entorno local a servidores de mayor capacidad cuando el proyecto crece.
+- **Seguridad y consistencia:** Garantiza que el código se ejecute de manera idéntica, reduciendo errores inesperados y facilitando la colaboración.
+- **Mantenimiento simplificado:** Las actualizaciones y cambios se gestionan centralizadamente sin afectar el entorno de producción.
+
+## Rocker: Simplificando el desarrollo reproducible
+
+El [Rocker Project](https://rocker-project.org/) ha hecho el trabajo pesado al proporcionar imágenes Docker preconfiguradas que incluyen R, RStudio y otros entornos especializados.
+
+Para obtener todos estos beneficios solo tenemos que seguir los siguientes pasos:
+
+1. Instalar Docker en tu sistema operativo.
+
+    - Si usas Windows o Mac puedes descargar Docker Desktop desde la [página oficial](https://www.docker.com/products/docker-desktop/).
+    
+    - Si usas Linux correr el siguiente bash script con permisos de administrador.
+    
+```bash
+apt update
+sudo apt install apt-transport-https ca-certificates curl gnupg2 software-properties-common
+curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian" bookworm stable
+apt update
+apt-cache policy docker-ce
+apt install docker-ce
+systemctl status docker
+/usr/sbin/usermod -aG docker <YOUR-USER>
+su - <YOUR-USER>
+```
+
+2. Crea una carpeta en la que almacenar todos los proyectos de R `<mis-proyectos>`.
+
+
+3. Dentro de `<mis-proyectos>` crea otra carpeta para almacenar copias de las librerías que irás usando en distintos proyectos `<mis-paquetes>`.
+
+
+4. Descarga y activa el contenedor a usar mediante el siguiente comando dentro de la línea de comando o dentro de **Docker Desktop**.
+
+```bash
+docker run --rm -tid --name rstudio \
+  -e DISABLE_AUTH=true \
+  -p 8787:8787 \
+  -v <mis-proyectos>:/home/rstudio \
+  -v <mis-proyectos>/<mis-paquetes>:/opt/r-cache \
+  ghcr.io/rocker-org/geospatial:4.4.3
+```
+
+5. Abre una ventana en tu navegador y ve al link `http://localhost:8787/` y verás a **RStudio** funcionando desde el contenedor.
+
+
+## Configurando git y github
+
+Una vez ya tienes R y RStudio funcionando ya podrás crear tus primeros proyectos y querrás compartir tu progreso con otros.
+
+Así como usamos las redes sociales para compartir nuestras experiencias, los programadores tienen una red social llamada **GitHub** en la que compartimos nuestro código y nos ayudamos mutuamente.
+
+Como ya el contenedor que estás corriendo tiene instalado **git** solo necesitas seguir los siguientes pasos para comenzar a utilizar esta poderosa herramienta.
+
+1. Crea una cuenta en [github.com](https://github.com/).
+
+2. Da clic al ícono con tu cuenta y da clic en **Settings**.
+
+3. Accede a SSH and GPG keys.
+
+4. En la esquina superior derecha dale clic a **New SSH key**.
+
+5. Define un nombre para tu clave como puede ser `<primera-clave>`.
+
+6. En RStudio ve a la terminal y ejecuta el comando `ssh-keygen` y luego da enter para generar una clave pública y una clave privada.
+
+7. Copia y pega el contenido de tu clave pública ubicada en la siguiente dirección dentro de la caja de Key:
+
+    -  Desde RStudio: /home/rstudio/.ssh/id_rsa.pub
+    -  Desde tu PC: <mis-proyectos>/.ssh/id_rsa.pub
+
+8. Da clic en el botón `Add SSH key`.
+
+9. Ahora solo queda configurar git con la misma cuenta que tenemos creada en GitHub al correr los siguientes comandos.
+
+```bash
+git config --global user.name "Nombre Apellido"
+git config --global user.email "user@email.com"
+```
