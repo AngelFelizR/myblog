@@ -4,7 +4,7 @@
     "href": "posts.html",
     "title": "Posts",
     "section": "",
-    "text": "Handling Missing Values\n\n\n\n\n\n\nMachine Learning\n\n\nFeature Engineering\n\n\n\n\n\n\n\n\n\nNov 9, 2023\n\n\nAngel Feliz\n\n\n\n\n\n\n\n\n\n\n\n\nThe Art of Readiable R code\n\n\n\n\n\n\nGood Practices\n\n\nCoding Style\n\n\n\n\n\n\n\n\n\nOct 22, 2023\n\n\nAngel Feliz\n\n\n\n\n\n\nNo matching items"
+    "text": "R + Docker: Configuración paso a paso para análisis de datos consistentes\n\n\n\n\n\n\nIntroduction to R\n\n\n\n\n\n\n\n\n\nMar 9, 2025\n\n\nAngel Feliz\n\n\n\n\n\n\n\n\n\n\n\n\nHandling Missing Values\n\n\n\n\n\n\nMachine Learning\n\n\nFeature Engineering\n\n\n\n\n\n\n\n\n\nNov 9, 2023\n\n\nAngel Feliz\n\n\n\n\n\n\n\n\n\n\n\n\nThe Art of Readiable R code\n\n\n\n\n\n\nGood Practices\n\n\nCoding Style\n\n\n\n\n\n\n\n\n\nOct 22, 2023\n\n\nAngel Feliz\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "posts/02-imputing-missing-values/main.html",
@@ -47,6 +47,48 @@
     "title": "Angel Feliz",
     "section": "",
     "text": "Senior Reporting Analyst with 2 years’ experience using R to process and create business reports in formats as Excel, Word, Power Point, and html.\nProven experience integrating ad hoc regular expressions to transform, extract and validate text data in data pipelines to find abnormalities and automate repetitive tasks; improving reporting accuracy, reducing waiting times and opening new possibilities to empower decision makers.\nAutodidactic, self-motivated, inquisitive, and eager to apply data science techniques to create business value and increase ROI for your company"
+  },
+  {
+    "objectID": "posts/03-intro-to-rocker/main.html",
+    "href": "posts/03-intro-to-rocker/main.html",
+    "title": "R + Docker: Configuración paso a paso para análisis de datos consistentes",
+    "section": "",
+    "text": "El lenguaje R es ampliamente reconocido por su versatilidad en el análisis de datos, y aunque se puede instalar y ejecutar directamente R y RStudio en casi cualquier sistema, usar entornos basados en contenedores —como los que ofrece el Rocker Project— nos brinda ventajas significativas a largo plazo."
+  },
+  {
+    "objectID": "posts/03-intro-to-rocker/main.html#r-una-herramienta-excepcional-para-el-análisis-de-datos",
+    "href": "posts/03-intro-to-rocker/main.html#r-una-herramienta-excepcional-para-el-análisis-de-datos",
+    "title": "R + Docker: Configuración paso a paso para análisis de datos consistentes",
+    "section": "1 R: Una herramienta excepcional para el análisis de datos",
+    "text": "1 R: Una herramienta excepcional para el análisis de datos\nR destaca por sus numerosas cualidades que lo hacen ideal para científicos de datos y analistas:\n\nGratuito y de código abierto: Permite el acceso libre a un ecosistema de paquetes y herramientas.\nAmplia variedad de herramientas: Existen innumerables paquetes y librerías diseñados para tareas específicas de análisis, estadística y visualización.\nFácil de aprender: Su sintaxis y comunidad de apoyo facilitan el proceso de aprendizaje para nuevos usuarios.\nMultiplataforma: Se ejecuta sin problemas en Windows, macOS y Linux.\nComunidad activa: La colaboración y el constante desarrollo impulsan la innovación y mejora continua del entorno."
+  },
+  {
+    "objectID": "posts/03-intro-to-rocker/main.html#la-importancia-de-la-reproducibilidad-a-lo-largo-del-tiempo",
+    "href": "posts/03-intro-to-rocker/main.html#la-importancia-de-la-reproducibilidad-a-lo-largo-del-tiempo",
+    "title": "R + Docker: Configuración paso a paso para análisis de datos consistentes",
+    "section": "2 La importancia de la reproducibilidad a lo largo del tiempo",
+    "text": "2 La importancia de la reproducibilidad a lo largo del tiempo\nCuando desarrollamos un programa en R, es fundamental que pueda ser reproducido incluso años después. Para lograrlo, es necesario garantizar:\n\nConsistencia del entorno: Utilizar la misma versión del sistema operativo, de R y de los paquetes instalados.\nPrevención de incompatibilidades: Las actualizaciones y cambios en el software pueden alterar el comportamiento del código.\nVerificación futura: Asegurar que los análisis y resultados se puedan validar y comparar con versiones anteriores.\nIntegridad en la investigación: Una base reproducible es esencial para la honestidad y la claridad en la comunicación científica."
+  },
+  {
+    "objectID": "posts/03-intro-to-rocker/main.html#ventajas-de-usar-entornos-de-desarrollo-en-contenedores",
+    "href": "posts/03-intro-to-rocker/main.html#ventajas-de-usar-entornos-de-desarrollo-en-contenedores",
+    "title": "R + Docker: Configuración paso a paso para análisis de datos consistentes",
+    "section": "3 Ventajas de usar entornos de desarrollo en contenedores",
+    "text": "3 Ventajas de usar entornos de desarrollo en contenedores\nEl uso de contenedores aporta un gran beneficio para la gestión y evolución de nuestros proyectos:\n\nAislamiento: El entorno de ejecución se mantiene separado del sistema operativo del host, evitando conflictos de dependencias.\nPortabilidad: Un contenedor puede ser ejecutado en cualquier máquina que tenga Docker, sin necesidad de reconfigurar el entorno.\nEscalabilidad: Es sencillo trasladar el entorno local a servidores de mayor capacidad cuando el proyecto crece.\nSeguridad y consistencia: Garantiza que el código se ejecute de manera idéntica, reduciendo errores inesperados y facilitando la colaboración.\nMantenimiento simplificado: Las actualizaciones y cambios se gestionan centralizadamente sin afectar el entorno de producción."
+  },
+  {
+    "objectID": "posts/03-intro-to-rocker/main.html#rocker-simplificando-el-desarrollo-reproducible",
+    "href": "posts/03-intro-to-rocker/main.html#rocker-simplificando-el-desarrollo-reproducible",
+    "title": "R + Docker: Configuración paso a paso para análisis de datos consistentes",
+    "section": "4 Rocker: Simplificando el desarrollo reproducible",
+    "text": "4 Rocker: Simplificando el desarrollo reproducible\nEl Rocker Project ha hecho el trabajo pesado al proporcionar imágenes Docker preconfiguradas que incluyen R, RStudio y otros entornos especializados.\nPara obtener todos estos beneficios solo tenemos que seguir los siguientes pasos:\n\nInstalar Docker en tu sistema operativo.\n\nSi usas Windows o Mac puedes descargar Docker Desktop desde la página oficial.\nSi usas Linux correr el siguiente bash script con permisos de administrador.\n\n\napt update\nsudo apt install apt-transport-https ca-certificates curl gnupg2 software-properties-common\ncurl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -\nadd-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/debian\" bookworm stable\napt update\napt-cache policy docker-ce\napt install docker-ce\nsystemctl status docker\n/usr/sbin/usermod -aG docker &lt;YOUR-USER&gt;\nsu - &lt;YOUR-USER&gt;\n\nCrea una carpeta en la que almacenar todos los proyectos de R &lt;mis-proyectos&gt;.\nDentro de &lt;mis-proyectos&gt; crea otra carpeta para almacenar copias de las librerías que irás usando en distintos proyectos &lt;mis-paquetes&gt;.\nDescarga y activa el contenedor a usar mediante el siguiente comando dentro de la línea de comando o dentro de Docker Desktop.\n\ndocker run --rm -tid --name rstudio \\\n  -e DISABLE_AUTH=true \\\n  -p 8787:8787 \\\n  -v &lt;mis-proyectos&gt;:/home/rstudio \\\n  -v &lt;mis-proyectos&gt;/&lt;mis-paquetes&gt;:/opt/r-cache \\\n  ghcr.io/rocker-org/geospatial:4.4.3\n\nAbre una ventana en tu navegador y ve al link http://localhost:8787/ y verás a RStudio funcionando desde el contenedor."
+  },
+  {
+    "objectID": "posts/03-intro-to-rocker/main.html#configurando-git-y-github",
+    "href": "posts/03-intro-to-rocker/main.html#configurando-git-y-github",
+    "title": "R + Docker: Configuración paso a paso para análisis de datos consistentes",
+    "section": "5 Configurando git y github",
+    "text": "5 Configurando git y github\nUna vez ya tienes R y RStudio funcionando ya podrás crear tus primeros proyectos y querrás compartir tu progreso con otros.\nAsí como usamos las redes sociales para compartir nuestras experiencias, los programadores tienen una red social llamada GitHub en la que compartimos nuestro código y nos ayudamos mutuamente.\nComo ya el contenedor que estás corriendo tiene instalado git solo necesitas seguir los siguientes pasos para comenzar a utilizar esta poderosa herramienta.\n\nCrea una cuenta en github.com.\nDa clic al ícono con tu cuenta y da clic en Settings.\nAccede a SSH and GPG keys.\nEn la esquina superior derecha dale clic a New SSH key.\nDefine un nombre para tu clave como puede ser &lt;primera-clave&gt;.\nEn RStudio ve a la terminal y ejecuta el comando ssh-keygen y luego da enter para generar una clave pública y una clave privada.\nCopia y pega el contenido de tu clave pública ubicada en la siguiente dirección dentro de la caja de Key:\n\nDesde RStudio: /home/rstudio/.ssh/id_rsa.pub\nDesde tu PC: /.ssh/id_rsa.pub\n\nDa clic en el botón Add SSH key.\nAhora solo queda configurar git con la misma cuenta que tenemos creada en GitHub al correr los siguientes comandos.\n\ngit config --global user.name \"Nombre Apellido\"\ngit config --global user.email \"user@email.com\""
   },
   {
     "objectID": "posts/01-readiable-code/main.html",

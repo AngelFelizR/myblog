@@ -2,6 +2,7 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/03-intro-to-rocker/main.html",
       "/posts/02-imputing-missing-values/main.html",
       "/posts/01-readiable-code/main.html"
     ]

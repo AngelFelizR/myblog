@@ -2,18 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://angelfeliz.com/posts.html</loc>
-    <lastmod>2024-02-12T23:11:01.655Z</lastmod>
+    <lastmod>2025-03-10T00:51:13.823Z</lastmod>
   </url>
   <url>
     <loc>https://angelfeliz.com/posts/02-imputing-missing-values/main.html</loc>
-    <lastmod>2024-02-12T23:11:01.655Z</lastmod>
+    <lastmod>2025-03-10T00:51:13.824Z</lastmod>
   </url>
   <url>
     <loc>https://angelfeliz.com/index.html</loc>
-    <lastmod>2024-02-12T23:11:01.655Z</lastmod>
+    <lastmod>2025-03-10T00:51:13.823Z</lastmod>
+  </url>
+  <url>
+    <loc>https://angelfeliz.com/posts/03-intro-to-rocker/main.html</loc>
+    <lastmod>2025-03-10T00:51:13.828Z</lastmod>
   </url>
   <url>
     <loc>https://angelfeliz.com/posts/01-readiable-code/main.html</loc>
-    <lastmod>2024-02-12T23:11:01.655Z</lastmod>
+    <lastmod>2025-03-10T00:51:13.823Z</lastmod>
   </url>
 </urlset>
