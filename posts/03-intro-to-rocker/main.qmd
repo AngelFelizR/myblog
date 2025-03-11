@@ -29,6 +29,8 @@ R destaca por sus numerosas cualidades que lo hacen ideal para científicos de d
 - **Multiplataforma:** Se ejecuta sin problemas en Windows, macOS y Linux.
 - **Comunidad activa:** La colaboración y el constante desarrollo impulsan la innovación y mejora continua del entorno.
 
+![](R-Vs-Excel.jpg)
+
 ## La importancia de la reproducibilidad a lo largo del tiempo
 
 Cuando desarrollamos un programa en R, es fundamental que pueda ser reproducido incluso años después. Para lograrlo, es necesario garantizar:
@@ -125,4 +127,12 @@ Como ya el contenedor que estás corriendo tiene instalado **git** solo necesita
 ```bash
 git config --global user.name "Nombre Apellido"
 git config --global user.email "user@email.com"
+```
+
+## Stopping container
+
+Once you have completed your task we can stop the container by running.
+
+```bash
+docker stop rstudio
 ```
