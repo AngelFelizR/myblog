@@ -91,6 +91,13 @@
     "text": "5 Configurando git y github\nUna vez ya tienes R y RStudio funcionando ya podrás crear tus primeros proyectos y querrás compartir tu progreso con otros.\nAsí como usamos las redes sociales para compartir nuestras experiencias, los programadores tienen una red social llamada GitHub en la que compartimos nuestro código y nos ayudamos mutuamente.\nComo ya el contenedor que estás corriendo tiene instalado git solo necesitas seguir los siguientes pasos para comenzar a utilizar esta poderosa herramienta.\n\nCrea una cuenta en github.com.\nDa clic al ícono con tu cuenta y da clic en Settings.\nAccede a SSH and GPG keys.\nEn la esquina superior derecha dale clic a New SSH key.\nDefine un nombre para tu clave como puede ser &lt;primera-clave&gt;.\nEn RStudio ve a la terminal y ejecuta el comando ssh-keygen y luego da enter para generar una clave pública y una clave privada.\nCopia y pega el contenido de tu clave pública ubicada en la siguiente dirección dentro de la caja de Key:\n\nDesde RStudio: /home/rstudio/.ssh/id_rsa.pub\nDesde tu PC: /.ssh/id_rsa.pub\n\nDa clic en el botón Add SSH key.\nAhora solo queda configurar git con la misma cuenta que tenemos creada en GitHub al correr los siguientes comandos.\n\ngit config --global user.name \"Nombre Apellido\"\ngit config --global user.email \"user@email.com\""
   },
   {
+    "objectID": "posts/03-intro-to-rocker/main.html#stopping-container",
+    "href": "posts/03-intro-to-rocker/main.html#stopping-container",
+    "title": "R + Docker: Configuración paso a paso para análisis de datos consistentes",
+    "section": "6 Stopping container",
+    "text": "6 Stopping container\nOnce you have completed your task we can stop the container by running.\ndocker stop rstudio"
+  },
+  {
     "objectID": "posts/01-readiable-code/main.html",
     "href": "posts/01-readiable-code/main.html",
     "title": "The Art of Readiable R code",
