@@ -14,7 +14,7 @@ format:
     number-sections: true
     smooth-scroll: true
 image: "data-preprocessing-blog.png"
-categories: [Data Science, Tidymodels]
+categories: [Machine Learning, Feature Engineering]
 ---
 
 # Introduction {.unnumbered}
