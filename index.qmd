@@ -49,6 +49,4 @@ This project showcases my skills with the R ecosystem, particularly with:
 
 I hold a Bachelor's in Industrial Engineering from Instituto Tecnológico de Santo Domingo and am fluent in both English and Spanish. I'm certified in [data science](https://www.datacamp.com/statement-of-accomplishment/track/b581b997d94da7a5a9cee1f7aac7f9427d09fd87?raw=1), [R programming](https://www.datacamp.com/statement-of-accomplishment/track/ef90c8e3e4906fa1533a788c7d24c556a7633a2c), and [data analysis](https://www.datacamp.com/statement-of-accomplishment/track/5eb368dc700e523f76bfe13a1f228b8772ebb6a5) through DataCamp.
 
-I'm actively preparing for new opportunities in data science where I can leverage my technical expertise and business acumen to drive data-informed decision making.
-
 :::
