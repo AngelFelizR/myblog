@@ -15,6 +15,8 @@ format:
     smooth-scroll: true
 image: "impute-example.png"
 categories: [Machine Learning, Feature Engineering]
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Introduction
@@ -106,7 +108,6 @@ fit_tuned_regression_model <- function(df,
                                        model_grid,
                                        formula,
                                        step_fun,
-                                       metric = rsq,
                                        seed = 1234){
   
   # Defining empty model workflow
@@ -125,9 +126,9 @@ fit_tuned_regression_model <- function(df,
     y_wf,
     resamples = y_resamples,
     grid = model_grid,
-    metrics = metric_set(metric)
+    metrics = metric_set(yardstick::rsq)
   )
-  
+
   # Selecting the best model
   y_trained_model <- 
     finalize_workflow(y_wf,
