@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.6.42">
+<meta name="generator" content="quarto-1.6.43">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -37,10 +37,10 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-d4d76bf8491c20bad77d141916dc28e1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-2ab55b6157d5e4697f9e172b4e6ec0ab.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-80f0d9b50d7ed910906b31cbfc86bee9.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -130,16 +130,12 @@ window.Quarto = {
 
 <link rel="stylesheet" href="styles.css">
 <meta property="og:title" content="Posts – Angel Feliz">
-<meta property="og:image" content="https://angelfeliz.com/posts/03-intro-to-rocker/rocker-logo.png">
+<meta property="og:image" content="https://angelfeliz.com/posts/04-data-preprocessing-with-tidymodels/data-preprocessing-blog.jpg">
 <meta property="og:site_name" content="Angel Feliz">
 <meta property="og:locale" content="en_US">
-<meta property="og:image:height" content="700">
-<meta property="og:image:width" content="700">
 <meta name="twitter:title" content="Posts – Angel Feliz">
-<meta name="twitter:image" content="https://angelfeliz.com/posts/03-intro-to-rocker/rocker-logo.png">
+<meta name="twitter:image" content="https://angelfeliz.com/posts/04-data-preprocessing-with-tidymodels/data-preprocessing-blog.jpg">
 <meta name="twitter:creator" content="@Angel_Feliz_F">
-<meta name="twitter:image-height" content="700">
-<meta name="twitter:image-width" content="700">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
@@ -213,7 +209,7 @@ window.Quarto = {
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(3)</span></div><div class="category" data-category="Q29kaW5nJTIwU3R5bGU=">Coding Style <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RmVhdHVyZSUyMEVuZ2luZWVyaW5n">Feature Engineering <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R29vZCUyMFByYWN0aWNlcw==">Good Practices <span class="quarto-category-count">(1)</span></div><div class="category" data-category="SW50cm9kdWN0aW9uJTIwdG8lMjBS">Introduction to R <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TWFjaGluZSUyMExlYXJuaW5n">Machine Learning <span class="quarto-category-count">(1)</span></div></div></div>
+    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(4)</span></div><div class="category" data-category="Q29kaW5nJTIwU3R5bGU=">Coding Style <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RGF0YSUyMFNjaWVuY2U=">Data Science <span class="quarto-category-count">(1)</span></div><div class="category" data-category="RmVhdHVyZSUyMEVuZ2luZWVyaW5n">Feature Engineering <span class="quarto-category-count">(1)</span></div><div class="category" data-category="R29vZCUyMFByYWN0aWNlcw==">Good Practices <span class="quarto-category-count">(1)</span></div><div class="category" data-category="SW50cm9kdWN0aW9uJTIwdG8lMjBS">Introduction to R <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TWFjaGluZSUyMExlYXJuaW5n">Machine Learning <span class="quarto-category-count">(1)</span></div><div class="category" data-category="VGlkeW1vZGVscw==">Tidymodels <span class="quarto-category-count">(1)</span></div></div></div>
 <!-- main -->
 <main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
 
@@ -227,7 +223,43 @@ window.Quarto = {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="SW50cm9kdWN0aW9uJTIwdG8lMjBS" data-listing-date-sort="1741478400000" data-listing-file-modified-sort="1741662627887" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="786">
+<div class="quarto-post image-right" data-index="0" data-categories="RGF0YSUyMFNjaWVuY2UlMkNUaWR5bW9kZWxz" data-listing-date-sort="1745712000000" data-listing-file-modified-sort="1745791753479" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1032">
+<div class="thumbnail">
+<p><a href="./posts/04-data-preprocessing-with-tidymodels/main.html" class="no-external"></a></p><a href="./posts/04-data-preprocessing-with-tidymodels/main.html" class="no-external">
+<p><img loading="lazy" src="./posts/04-data-preprocessing-with-tidymodels/data-preprocessing-blog.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/04-data-preprocessing-with-tidymodels/main.html" class="no-external"></a></p>
+</div>
+<div class="body">
+<h3 class="no-anchor listing-title">
+<a href="./posts/04-data-preprocessing-with-tidymodels/main.html" class="no-external">Data Preprocessing with {tidymodels} and R</a>
+</h3>
+<div class="listing-subtitle">
+<a href="./posts/04-data-preprocessing-with-tidymodels/main.html" class="no-external"></a>
+</div>
+<div class="listing-categories">
+<div class="listing-category" onclick="window.quartoListingCategory('RGF0YSUyMFNjaWVuY2U='); return false;">
+Data Science
+</div>
+<div class="listing-category" onclick="window.quartoListingCategory('VGlkeW1vZGVscw=='); return false;">
+Tidymodels
+</div>
+</div>
+<div class="listing-description">
+<a href="./posts/04-data-preprocessing-with-tidymodels/main.html" class="no-external">Data preprocessing is the cornerstone of robust machine learning pipelines. Drawing from Max Kuhn’s <em>Applied Predictive Modeling</em>, this guide explores essential…</a>
+</div>
+</div>
+<div class="metadata">
+<a href="./posts/04-data-preprocessing-with-tidymodels/main.html" class="no-external">
+<div class="listing-date">
+Apr 27, 2025
+</div>
+<div class="listing-author">
+Angel Feliz
+</div>
+</a>
+</div>
+</div>
+<div class="quarto-post image-right" data-index="1" data-categories="SW50cm9kdWN0aW9uJTIwdG8lMjBS" data-listing-date-sort="1741478400000" data-listing-file-modified-sort="1745791753479" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="786">
 <div class="thumbnail">
 <p><a href="./posts/03-intro-to-rocker/main.html" class="no-external"></a></p><a href="./posts/03-intro-to-rocker/main.html" class="no-external">
 <p><img loading="lazy" src="./posts/03-intro-to-rocker/rocker-logo.png" class="thumbnail-image"></p>
@@ -260,7 +292,7 @@ Angel Feliz
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="TWFjaGluZSUyMExlYXJuaW5nJTJDRmVhdHVyZSUyMEVuZ2luZWVyaW5n" data-listing-date-sort="1699488000000" data-listing-file-modified-sort="1741662627887" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1664">
+<div class="quarto-post image-right" data-index="2" data-categories="TWFjaGluZSUyMExlYXJuaW5nJTJDRmVhdHVyZSUyMEVuZ2luZWVyaW5n" data-listing-date-sort="1699488000000" data-listing-file-modified-sort="1745791753479" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1621">
 <div class="thumbnail">
 <p><a href="./posts/02-imputing-missing-values/main.html" class="no-external"></a></p><a href="./posts/02-imputing-missing-values/main.html" class="no-external">
 <p><img loading="lazy" src="./posts/02-imputing-missing-values/impute-example.png" class="thumbnail-image"></p>
@@ -296,7 +328,7 @@ Angel Feliz
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="R29vZCUyMFByYWN0aWNlcyUyQ0NvZGluZyUyMFN0eWxl" data-listing-date-sort="1697932800000" data-listing-file-modified-sort="1741662627886" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1969">
+<div class="quarto-post image-right" data-index="3" data-categories="R29vZCUyMFByYWN0aWNlcyUyQ0NvZGluZyUyMFN0eWxl" data-listing-date-sort="1697932800000" data-listing-file-modified-sort="1745791753478" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1969">
 <div class="thumbnail">
 <p><a href="./posts/01-readiable-code/main.html" class="no-external"></a></p><a href="./posts/01-readiable-code/main.html" class="no-external">
 <p><img loading="lazy" src="./posts/01-readiable-code/readable-code-bing.jfif" class="thumbnail-image"></p>

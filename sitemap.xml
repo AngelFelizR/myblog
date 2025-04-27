@@ -2,22 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://angelfeliz.com/posts.html</loc>
-    <lastmod>2025-03-11T03:10:27.886Z</lastmod>
+    <lastmod>2025-04-27T22:09:13.477Z</lastmod>
   </url>
   <url>
     <loc>https://angelfeliz.com/posts/02-imputing-missing-values/main.html</loc>
-    <lastmod>2025-03-11T03:10:27.887Z</lastmod>
-  </url>
-  <url>
-    <loc>https://angelfeliz.com/index.html</loc>
-    <lastmod>2025-03-11T03:10:27.886Z</lastmod>
-  </url>
-  <url>
-    <loc>https://angelfeliz.com/posts/03-intro-to-rocker/main.html</loc>
-    <lastmod>2025-03-11T03:10:27.887Z</lastmod>
+    <lastmod>2025-04-27T22:09:13.479Z</lastmod>
   </url>
   <url>
     <loc>https://angelfeliz.com/posts/01-readiable-code/main.html</loc>
-    <lastmod>2025-03-11T03:10:27.886Z</lastmod>
+    <lastmod>2025-04-27T22:09:13.478Z</lastmod>
+  </url>
+  <url>
+    <loc>https://angelfeliz.com/posts/03-intro-to-rocker/main.html</loc>
+    <lastmod>2025-04-27T22:09:13.479Z</lastmod>
+  </url>
+  <url>
+    <loc>https://angelfeliz.com/posts/04-data-preprocessing-with-tidymodels/main.html</loc>
+    <lastmod>2025-04-27T22:09:13.479Z</lastmod>
+  </url>
+  <url>
+    <loc>https://angelfeliz.com/index.html</loc>
+    <lastmod>2025-04-27T22:09:13.477Z</lastmod>
   </url>
 </urlset>
