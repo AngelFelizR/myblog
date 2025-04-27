@@ -11,8 +11,6 @@ website:
   description: "Personal blog related to R and Data Science"
   open-graph:
     locale: en_US
-  twitter-card:
-    creator: "@Angel_Feliz_F"
   comments:
     utterances:
       repo: AngelFelizR/myblog
@@ -20,12 +18,9 @@ website:
     left:
       - href: posts.qmd
         text: Blog
-      - icon: mastodon
-        href: https://fosstodon.org/@AngelFelizF
+    right:
       - icon: github
         href: https://github.com/AngelFelizR/
-      - icon: twitter
-        href: https://twitter.com/angel_feliz_f
       - icon: linkedin
         href: https://do.linkedin.com/in/angel-esteban-feliz-ferreras
 

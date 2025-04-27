@@ -13,7 +13,7 @@ format:
     self-contained: true
     number-sections: true
     smooth-scroll: true
-image: "data-preprocessing-blog.jpg"
+image: "data-preprocessing-blog.png"
 categories: [Data Science, Tidymodels]
 ---
 

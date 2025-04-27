@@ -7,12 +7,6 @@ about:
     - text: LinkedIn
       icon: linkedin
       url: "https://do.linkedin.com/in/angel-esteban-feliz-ferreras"
-    - text: Twitter
-      icon: twitter
-      url: "https://twitter.com/angel_feliz_f"
-    - text: Mastodon
-      icon: mastodon
-      url: "https://fosstodon.org/@AngelFelizF"
     - text: GitHub
       icon: github
       url: "https://github.com/AngelFelizR"
@@ -23,12 +17,38 @@ comments: false
 
 ::: {.column-page}
 
-## Bio
+I'm a Data Scientist specializing in R programming with experience in reporting automation, data visualization, and package development. Currently working remotely as a **Leasing Reporting Manager** at Phoenix Tower International, where I lead development of R packages to improve critical business reports and data workflows.
 
-Senior Reporting Analyst with 2 years’ experience using R to process and create business reports in formats as Excel, Word, Power Point, and html. 
+## Professional Journey
 
-Proven experience integrating ad hoc regular expressions to transform, extract and validate text data in data pipelines to find abnormalities and automate repetitive tasks; improving reporting accuracy, reducing waiting times and opening new possibilities to empower decision makers. 
+Starting as a junior data analyst, I've grown into a data professional who excels at automating processes, ensuring data quality, and delivering actionable insights. My experience spans financial reporting, data migration, and building validation frameworks that have significantly reduced manual effort while improving accuracy.
 
-Autodidactic, self-motivated, inquisitive, and eager to apply data science techniques to create business value and increase ROI for your company
+I'm passionate about open source contribution and have authored several R packages, including:
+
+- **biblegatewayr**: For scraping Bible verses
+- **tidyvalidate**: For identifying business errors in tables
+- **corrcat**: For exploring correlations between categorical variables
+
+I've also contributed to the `{data.table}` package, writing the primary documentation for [join operations](https://rdatatable.gitlab.io/data.table/articles/datatable-joins.html).
+
+## Current Project
+
+I'm currently working on a [data science portfolio project](https://github.com/AngelFelizR/NycTaxi) focused on **increasing NYC taxi drivers' earnings** through data-driven strategies. Using the CRISP-DM methodology, I'm analyzing rideshare data from Juno, Uber, Via and Lyft to determine:
+
+- How drivers can increase monthly earnings by selectively skipping trips?
+- How changing initial locations and timing can optimize earnings?
+
+This project showcases my skills with the R ecosystem, particularly with:
+
+- Tidyverse packages for data manipulation and visualization
+- Geospatial analysis using sf, leaflet, and tmap
+- Statistical modeling and inference
+- Database connectivity and high-performance data manipulation
+
+## Skills & Education
+
+I hold a Bachelor's in Industrial Engineering from Instituto Tecnológico de Santo Domingo and am fluent in both English and Spanish. I'm certified in [data science](https://www.datacamp.com/statement-of-accomplishment/track/b581b997d94da7a5a9cee1f7aac7f9427d09fd87?raw=1), [R programming](https://www.datacamp.com/statement-of-accomplishment/track/ef90c8e3e4906fa1533a788c7d24c556a7633a2c), and [data analysis](https://www.datacamp.com/statement-of-accomplishment/track/5eb368dc700e523f76bfe13a1f228b8772ebb6a5) through DataCamp.
+
+I'm actively preparing for new opportunities in data science where I can leverage my technical expertise and business acumen to drive data-informed decision making.
 
 :::
