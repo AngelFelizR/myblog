@@ -14,7 +14,7 @@ format:
     number-sections: true
     smooth-scroll: true
 image: "rocker-logo.png"
-categories: [Introduction to R]
+categories: [Introduction to R, Good Practices]
 ---
 
 El **lenguaje R** es ampliamente reconocido por su versatilidad en el análisis de datos, y aunque se puede instalar y ejecutar directamente R y RStudio en casi cualquier sistema, usar entornos basados en contenedores —como los que ofrece el [Rocker Project](https://rocker-project.org/)— nos brinda ventajas significativas a largo plazo.
