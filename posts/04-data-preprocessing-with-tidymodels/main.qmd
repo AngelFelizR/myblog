@@ -1,0 +1,367 @@
+---
+title: "Data Preprocessing with {tidymodels} and R"
+author: "Angel Feliz"
+date: "2025-04-27"
+format: 
+  html:
+    fig-width: 12
+    fig-height: 8
+    fig-align: "center"
+    toc: true
+    toc-title: Index
+    toc-location: left
+    self-contained: true
+    number-sections: true
+    smooth-scroll: true
+image: "data-preprocessing-blog.jpg"
+categories: [Data Science, Tidymodels]
+---
+
+# Introduction {.unnumbered}
+
+Data preprocessing is the cornerstone of robust machine learning pipelines. Drawing from Max Kuhn's *Applied Predictive Modeling*, this guide explores essential transformations through the {tidymodels} lens. We'll bridge theory with practical implementation, examining when, why, and how to apply each technique while weighing their tradeoffs.
+
+# Foundational Transformations
+
+## Centering and Scaling
+
+**When to Use**:
+
+- Models sensitive to predictor magnitude (SVM, KNN, neural networks)
+- Before dimensionality reduction (PCA) or spatial sign transformations
+- When predictors have different measurement scales
+
+**Why It Matters**:
+
+- Centers variables around zero (μ=0)
+- Standardizes variance (σ=1)
+- Enables meaningful coefficient comparisons
+- Critical for distance-based calculations and numerical stability
+
+**Implementation**:
+```{r}
+#| warning: false
+#| message: false
+
+library(tidymodels)
+
+norm_recipe <- recipe(mpg ~ ., data = mtcars) |>
+  step_normalize(all_numeric_predictors()) |>
+  prep()
+
+bake(norm_recipe, new_data = NULL) |> summary()
+```
+
+**Pros**:
+
+- Required for distance-based algorithms
+- Improves numerical stability
+- Facilitates convergence in gradient-based methods
+
+**Cons**:
+
+- Loses original measurement context
+- Not needed for tree-based models
+- Sensitive to outlier influence
+
+::: {.callout-warning}
+Always calculate scaling parameters from training data only to avoid data leakage. Resampling should encapsulate preprocessing steps for honest performance estimation.
+:::
+
+## Resolving Skewness
+
+**When to Use**:
+
+- Smallest to largest ratio > 20 (max/min)
+- Right/left-tailed distributions (|skewness| > 1)
+- Before linear model assumptions
+- When preparing for PCA or other variance-sensitive methods
+
+**Skewness Formula**:
+
+$$skewness = \frac{\sum(x_i - \bar{x})^3}{(n-1)v^{3/2}} \quad \text{where } v = \frac{\sum(x_i - \bar{x})^2}{(n-1)}$$
+
+**Box-Cox Implementation**:
+
+```{r}
+data(ames, package = "modeldata")
+
+skew_recipe <- recipe(Sale_Price ~ Gr_Liv_Area, data = ames) |>
+  step_BoxCox(Gr_Liv_Area, limits = c(-2, 2)) |> # MLE for λ
+  prep()
+
+tidy(skew_recipe) # Shows selected λ value
+
+# Calculate original skewness
+ames |> 
+  summarize(skewness = moments::skewness(Gr_Liv_Area))
+```
+
+**Transformation Options**:
+
+- λ=2 → Square
+- λ=0.5 → Square root
+- λ=-1 → Inverse
+- λ=0 → Natural log
+
+**Pros**:
+
+- Data-driven transformation selection
+- Handles zero values gracefully
+- Continuous transformation spectrum
+
+**Cons**:
+
+- Requires strictly positive values
+- Loses interpretability
+- Sensitive to outlier influence
+
+# Advanced Techniques
+
+## Spatial Sign for Outliers
+
+**When to Use**:
+
+- High-dimensional data
+- Models sensitive to outlier magnitude (linear regression)
+- When robust scaling isn't sufficient
+- Dealing with radial outliers in multidimensional space
+
+**Critical Considerations**:
+
+- Investigate outliers for data entry errors first
+- Consider cluster validity before removal
+- Understand missingness mechanism (MCAR/MAR/MNAR)
+
+**Implementation**:
+
+```{r}
+outlier_recipe <- recipe(Species ~ Sepal.Length + Sepal.Width, data = iris) |>
+  step_normalize(all_numeric()) |> # Mandatory first step
+  step_spatialsign(all_numeric()) |>
+  prep()
+
+bake(outlier_recipe, new_data = NULL) |>
+  ggplot(aes(Sepal.Length, Sepal.Width, color = Species)) +
+  geom_point()+
+  theme_minimal()
+```
+
+**Pros**:
+
+- Robust to extreme outliers
+- Maintains relative angles
+- Non-parametric approach
+
+**Cons**:
+
+- Destroys magnitude information
+- Requires centered/scaled data
+- Not suitable for sparse data
+
+## PCA for Data Reduction
+
+**Optimal Workflow**:
+
+1. Resolve skewness (Box-Cox/Yeo-Johnson)
+2. Center/scale predictors
+3. Determine components via cross-validation/scree plot
+4. Validate via resampling
+
+**Component Selection**:
+
+- Retain components before scree plot elbow
+- Cumulative variance >80-90%
+- Cross-validate performance
+
+**Implementation**:
+
+```{r}
+pca_recipe <- recipe(Species ~ ., data = iris) |>
+  step_normalize(all_numeric()) |>
+  step_pca(all_numeric(), num_comp = 4L) |> #tune()
+  prep()
+
+# Scree plot visualization
+pca_vars <- tidy(pca_recipe, 2, type = "variance")
+
+pca_vars |> 
+  filter(terms == "percent variance") |>
+  ggplot(aes(component, value)) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Scree Plot", y = "% Variance Explained") +
+  theme_minimal()
+
+# Component interpretation
+tidy(pca_recipe, 2) |> 
+  filter(component == "PC1") |> 
+  arrange(-abs(value))
+```
+
+**Pros**:
+
+- Removes multicollinearity
+- Reduces computational load
+- Reveals latent structure
+
+**Cons**:
+
+- Loss of interpretability
+- Sensitive to scaling
+- Linear assumptions
+- Supervised methods (PLS) may be preferable for outcome-aware reduction
+
+# Handling Data Challenges
+
+## Missing Value Imputation
+
+**Critical Considerations**:
+
+- **Informative missingness**: Is missing pattern related to outcome?
+- **Censored data**: Different treatment than MCAR/MAR
+- >5% missing → Consider removal
+- Type-appropriate methods (KNN vs regression)
+
+**Imputation Strategies**:
+
+| Scenario              | Approach                         |
+|-----------------------|----------------------------------|
+| <5% missing           | Median/mode imputation          |
+| Continuous predictors | KNN, linear regression, bagging |
+| Categorical           | Mode, multinomial logit         |
+| High dimensionality   | Regularized models, MICE        |
+
+**Implementation**:
+
+```{r}
+ames2 <- ames
+ames2$Year_Built2 <- ames2$Year_Built
+
+set.seed(5858)
+ames2[sample.int(2930, 1000), c("Year_Built2")] <- NA_integer_
+ames2[sample.int(2930, 800), c("Lot_Frontage")] <- NA_integer_
+
+impute_recipe <- recipe(Sale_Price ~ Lot_Frontage + Year_Built2 + Year_Built, data = ames2) |>
+  step_impute_knn(Lot_Frontage, neighbors = 3L) |> #tune()
+  step_impute_linear(Year_Built2, impute_with = imp_vars(Year_Built)) |>
+  prep()
+
+# Assess imputation quality
+complete_data <- bake(impute_recipe, new_data = ames2)
+cor(complete_data$Year_Built, complete_data$Year_Built2, use = "complete.obs")
+cor(complete_data$Lot_Frontage, ames$Lot_Frontage, use = "complete.obs")
+```
+
+## Feature Filtering
+
+**Near-Zero Variance Detection**:
+
+- Frequency ratio > 20
+- Unique values < 10%
+- Percent unique = n_unique/n * 100
+
+```{r}
+nzv_recipe <- recipe(Species ~ ., data = iris) |>
+  step_nzv(all_predictors(), freq_cut = 95/5, unique_cut = 10) |>
+  prep()
+
+tidy(nzv_recipe)
+```
+
+**Multicollinearity Handling**:
+
+- Variance Inflation Factor (VIF) > 5-10
+- Pairwise correlation threshold
+- Iterative removal algorithm
+
+```{r}
+corr_recipe <- recipe(Species ~ ., data = iris) |>
+  step_corr(all_numeric(), threshold = 0.9, method = "spearman") |>
+  prep()
+
+tidy(corr_recipe)
+```
+
+# Strategic Feature Engineering
+
+## Categorical Encoding & Nonlinear Terms
+
+**Best Practices**:
+
+- Dummy variables for nominal predictors (one-hot encoding)
+- Ordered factors for ordinal categories
+- Include interaction terms where domain knowledge suggests
+- Add polynomial terms for known nonlinear relationships
+
+**Example**:
+
+```{r}
+nonlinear_recipe <- recipe(Species ~ ., data = iris) |>
+  step_dummy(all_nominal(), -all_outcomes()) |>
+  step_poly(Sepal.Length, degree = 2) |>
+  step_interact(~ Sepal.Width:Petal.Length) |>
+  prep()
+```
+
+## Distance to Class Centroids
+
+**When to Use**:
+
+- Classification problems
+- Cluster-aware feature engineering
+- Improving linear separability
+- Augmenting existing feature set
+
+**Implementation**:
+
+```{r}
+centroid_recipe <- recipe(Species ~ ., data = iris) |>
+  step_classdist(all_numeric(), class = "Species", pool = FALSE) |>
+  prep()
+
+bake(centroid_recipe, new_data = NULL) |>
+  select(starts_with("classdist_")) |>
+  head()
+```
+
+## Binning Strategies
+
+**When to Avoid**:
+
+- Manual binning pre-analysis
+- With tree-based models
+- Small sample sizes
+- When interpretability trumps accuracy
+
+**Ethical Considerations**:
+
+- Medical diagnostics require maximum accuracy
+- Legal implications of arbitrary thresholds
+- Potential bias introduction through careless discretization
+
+**Smart Discretization**:
+
+```{r}
+bin_recipe <- recipe(Sale_Price ~ Gr_Liv_Area, data = ames) |>
+  step_discretize(Gr_Liv_Area, num_breaks = 4, min_unique = 10) |>
+  prep()
+
+bake(bin_recipe, new_data = NULL) |>
+  count(Gr_Liv_Area)
+```
+
+# Conclusion {.unnumbered}
+
+Effective preprocessing requires understanding your data's story and your model's needs. As Kuhn emphasizes:
+
+> "Preprocessing decisions should be made with the same care as model selection."
+
+{tidymodels} provides a cohesive framework to implement these transformations systematically. Remember:
+
+- **Validate** preprocessing via nested resampling
+- **Document** transformations for reproducibility
+- **Monitor** model applicability domain
+- **Consider ethical implications** of engineering choices
+
+By mastering these techniques, you'll transform raw data into model-ready features while avoiding common pitfalls. The art lies in balancing mathematical rigor with practical implementation - a balance {tidymodels} helps achieve elegantly.
