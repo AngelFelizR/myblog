@@ -1,0 +1,58 @@
+title,model,engine,topic,mode,package
+C5.0 rule-based classification models,C5_rules,C5.0,C5_rules_C5.0,classification,parsnip
+Bagged MARS via earth,bag_mars,earth,bag_mars_earth,classification,parsnip
+Bagged neural networks via nnet,bag_mlp,nnet,bag_mlp_nnet,classification,parsnip
+Bagged trees via C5.0,bag_tree,C5.0,bag_tree_C5.0,classification,parsnip
+Bagged trees via rpart,bag_tree,rpart,bag_tree_rpart,classification,parsnip
+Bayesian additive regression trees via dbarts,bart,dbarts,bart_dbarts,classification,parsnip
+Boosted trees via C5.0,boost_tree,C5.0,boost_tree_C5.0,classification,parsnip
+Boosted trees via lightgbm,boost_tree,lightgbm,boost_tree_lightgbm,classification,parsnip
+Boosted trees via Spark,boost_tree,spark,boost_tree_spark,classification,parsnip
+Boosted trees via xgboost,boost_tree,xgboost,boost_tree_xgboost,classification,parsnip
+Decision trees via C5.0,decision_tree,C5.0,decision_tree_C5.0,classification,parsnip
+Decision trees via partykit,decision_tree,partykit,decision_tree_partykit,classification,parsnip
+Decision trees via CART,decision_tree,rpart,decision_tree_rpart,classification,parsnip
+Decision trees via Spark,decision_tree,spark,decision_tree_spark,classification,parsnip
+Flexible discriminant analysis via earth,discrim_flexible,earth,discrim_flexible_earth,classification,parsnip
+Linear discriminant analysis via MASS,discrim_linear,MASS,discrim_linear_MASS,classification,parsnip
+Linear discriminant analysis via flexible discriminant analysis,discrim_linear,mda,discrim_linear_mda,classification,parsnip
+Linear discriminant analysis via James-Stein-type shrinkage estimation,discrim_linear,sda,discrim_linear_sda,classification,parsnip
+Linear discriminant analysis via regularization,discrim_linear,sparsediscrim,discrim_linear_sparsediscrim,classification,parsnip
+Quadratic discriminant analysis via MASS,discrim_quad,MASS,discrim_quad_MASS,classification,parsnip
+Quadratic discriminant analysis via regularization,discrim_quad,sparsediscrim,discrim_quad_sparsediscrim,classification,parsnip
+Regularized discriminant analysis via klaR,discrim_regularized,klaR,discrim_regularized_klaR,classification,parsnip
+Generalized additive models via mgcv,gen_additive_mod,mgcv,gen_additive_mod_mgcv,classification,parsnip
+Logistic regression via LiblineaR,logistic_reg,LiblineaR,logistic_reg_LiblineaR,classification,parsnip
+Logistic regression via brulee,logistic_reg,brulee,logistic_reg_brulee,classification,parsnip
+Logistic regression via glm,logistic_reg,glm,logistic_reg_glm,classification,parsnip
+Logistic regression via glmnet,logistic_reg,glmnet,logistic_reg_glmnet,classification,parsnip
+Logistic regression via keras,logistic_reg,keras,logistic_reg_keras,classification,parsnip
+Logistic regression via spark,logistic_reg,spark,logistic_reg_spark,classification,parsnip
+Logistic regression via stan,logistic_reg,stan,logistic_reg_stan,classification,parsnip
+Multivariate adaptive regression splines (MARS) via earth,mars,earth,mars_earth,classification,parsnip
+MaxEnt model,maxent,maxnet,maxent,classification,tidysdm
+Multilayer perceptron via brulee,mlp,brulee,mlp_brulee,classification,parsnip
+Multilayer perceptron via brulee with two hidden layers,mlp,brulee_two_layer,mlp_brulee_two_layer,classification,parsnip
+Multilayer perceptron via keras,mlp,keras,mlp_keras,classification,parsnip
+Multilayer perceptron via nnet,mlp,nnet,mlp_nnet,classification,parsnip
+Multinomial regression via brulee,multinom_reg,brulee,multinom_reg_brulee,classification,parsnip
+Multinomial regression via glmnet,multinom_reg,glmnet,multinom_reg_glmnet,classification,parsnip
+Multinomial regression via keras,multinom_reg,keras,multinom_reg_keras,classification,parsnip
+Multinomial regression via nnet,multinom_reg,nnet,multinom_reg_nnet,classification,parsnip
+Multinomial regression via spark,multinom_reg,spark,multinom_reg_spark,classification,parsnip
+Naive Bayes models via klaR,naive_Bayes,klaR,naive_Bayes_klaR,classification,parsnip
+Naive Bayes models via naivebayes,naive_Bayes,naivebayes,naive_Bayes_naivebayes,classification,parsnip
+K-nearest neighbors via kknn,nearest_neighbor,kknn,nearest_neighbor_kknn,classification,parsnip
+Null model,null_model,parsnip,null_model,classification,parsnip
+Partial least squares via mixOmics,pls,mixOmics,pls_mixOmics,classification,parsnip
+Oblique random survival forests via aorsf,rand_forest,aorsf,rand_forest_aorsf,classification,parsnip
+Random forests via partykit,rand_forest,partykit,rand_forest_partykit,classification,parsnip
+Random forests via randomForest,rand_forest,randomForest,rand_forest_randomForest,classification,parsnip
+Random forests via ranger,rand_forest,ranger,rand_forest_ranger,classification,parsnip
+Random forests via spark,rand_forest,spark,rand_forest_spark,classification,parsnip
+RuleFit models via xrf,rule_fit,xrf,rule_fit_xrf,classification,parsnip
+Linear support vector machines (SVMs) via LiblineaR,svm_linear,LiblineaR,svm_linear_LiblineaR,classification,parsnip
+Linear support vector machines (SVMs) via kernlab,svm_linear,kernlab,svm_linear_kernlab,classification,parsnip
+Polynomial support vector machines (SVMs) via kernlab,svm_poly,kernlab,svm_poly_kernlab,classification,parsnip
+Radial basis function support vector machines (SVMs) via kernlab,svm_rbf,kernlab,svm_rbf_kernlab,classification,parsnip
+Radial basis function support vector machines,svm_rbf,liquidSVM,svm_rbf,classification,parsnip
