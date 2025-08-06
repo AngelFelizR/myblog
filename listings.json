@@ -2,6 +2,7 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/05-preprocessing-by-classification-model/main.html",
       "/posts/04-data-preprocessing-with-tidymodels/main.html",
       "/posts/03-intro-to-rocker/main.html",
       "/posts/02-imputing-missing-values/main.html",
