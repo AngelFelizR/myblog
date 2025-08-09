@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://angelfeliz.com/posts.html</loc>
-    <lastmod>2025-08-06T05:09:21.443Z</lastmod>
-  </url>
-  <url>
-    <loc>https://angelfeliz.com/posts/03-intro-to-rocker/main.html</loc>
-    <lastmod>2025-08-06T05:09:21.445Z</lastmod>
+    <loc>https://angelfeliz.com/index.html</loc>
+    <lastmod>2025-08-09T05:06:19.799Z</lastmod>
   </url>
   <url>
     <loc>https://angelfeliz.com/posts/04-data-preprocessing-with-tidymodels/main.html</loc>
-    <lastmod>2025-08-06T05:09:21.449Z</lastmod>
-  </url>
-  <url>
-    <loc>https://angelfeliz.com/index.html</loc>
-    <lastmod>2025-08-06T05:09:21.443Z</lastmod>
-  </url>
-  <url>
-    <loc>https://angelfeliz.com/posts/05-preprocessing-by-classification-model/main.html</loc>
-    <lastmod>2025-08-06T05:09:21.452Z</lastmod>
+    <lastmod>2025-08-09T05:06:19.805Z</lastmod>
   </url>
   <url>
     <loc>https://angelfeliz.com/posts/02-imputing-missing-values/main.html</loc>
-    <lastmod>2025-08-06T05:09:21.444Z</lastmod>
+    <lastmod>2025-08-09T05:06:19.800Z</lastmod>
+  </url>
+  <url>
+    <loc>https://angelfeliz.com/posts/03-intro-to-rocker/main.html</loc>
+    <lastmod>2025-08-09T05:06:19.800Z</lastmod>
+  </url>
+  <url>
+    <loc>https://angelfeliz.com/posts/05-preprocessing-by-classification-model/main.html</loc>
+    <lastmod>2025-08-09T05:06:19.808Z</lastmod>
   </url>
   <url>
     <loc>https://angelfeliz.com/posts/01-readiable-code/main.html</loc>
-    <lastmod>2025-08-06T05:09:21.443Z</lastmod>
+    <lastmod>2025-08-09T05:06:19.799Z</lastmod>
+  </url>
+  <url>
+    <loc>https://angelfeliz.com/posts.html</loc>
+    <lastmod>2025-08-09T05:06:19.799Z</lastmod>
   </url>
 </urlset>
