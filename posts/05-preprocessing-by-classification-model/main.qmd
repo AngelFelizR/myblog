@@ -183,6 +183,7 @@ A robust, general-purpose preprocessing pipeline suitable for most tabular class
 9. **Custom transformations** (`step_mutate()`): Allows tailored feature engineering.
 
 For specific model families, adjust this baseline:
+
 - **Tree-based models** (`ranger`, `xgboost`, `C5.0`, `bart`): Skip `step_ns()`, `step_interact()`, and `step_normalize()`.
 - **Linear models, GAMs, MARS** (`glmnet`, `gen_additive_mod`, `mars`): Include all steps, especially `step_normalize()` and `step_pca()`.
 - **SVM/KNN**: Prioritize `step_normalize()` and `step_YeoJohnson()`.

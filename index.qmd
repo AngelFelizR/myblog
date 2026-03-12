@@ -11,42 +11,48 @@ about:
       icon: github
       url: "https://github.com/AngelFelizR"
     - text: CV
-      url: "00-Angel-Feliz-Resume.pdf"
+      url: "Angel-Feliz_Applied-Scientist.pdf"
 comments: false
 ---
 
+<div class="badge-base LI-profile-badge" data-locale="en_US" data-size="large" data-theme="light" data-type="HORIZONTAL" data-vanity="angel-esteban-feliz-ferreras" data-version="v1"><a class="badge-base__link LI-simple-link" href="https://do.linkedin.com/in/angel-esteban-feliz-ferreras?trk=profile-badge">Angel Esteban Feliz Ferreras</a></div> 
+
 ::: {.column-page}
 
-I'm a Data Scientist specializing in R programming with experience in reporting automation, data visualization, and package development. Currently working remotely as a **Leasing Reporting Manager** at Phoenix Tower International, where I lead development of R packages to improve critical business reports and data workflows.
+I am an **Applied Scientist** specializing in **Sequential Decision Analytics (SDA)** and reproducible optimization. My work focuses on designing and deploying online decision policies under uncertainty that deliver measurable economic impact. 
+
+Currently, I serve as the **Leasing Reporting Manager** at Phoenix Tower International, where I bridge the gap between data engineering and decision science. I leverage the Warren B. Powell framework (specifically PFA and DLA classes) to transform massive datasets into optimal real-time decisions, ensuring 100% reproducibility through Nix, Docker, and GitHub Actions.
 
 ## Professional Journey
 
-Starting as a junior data analyst, I've grown into a data professional who excels at automating processes, ensuring data quality, and delivering actionable insights. My experience spans financial reporting, data migration, and building validation frameworks that have significantly reduced manual effort while improving accuracy.
+My expertise lies in moving beyond deterministic batch optimization toward simulation-driven decision-making. I have a proven track record of building production-grade simulation environments—including Monte Carlo and Discrete Event Simulations—to solve complex operational challenges. 
 
-I'm passionate about open source contribution and have authored several R packages, including:
+I am a strong advocate for open-source R development and have authored several packages:
 
-- **biblegatewayr**: For scraping Bible verses
-- **tidyvalidate**: For identifying business errors in tables
-- **corrcat**: For exploring correlations between categorical variables
+- **{tidyvalidate}**: A production-grade validation layer for identifying business logic errors.
+- **{biblegatewayr}**: A tool for programmatic web-scraping of Bible verses.
+- **{corrcat}**: A package for exploring associations between categorical variables.
 
-I've also contributed to the `{data.table}` package, writing the primary documentation for [join operations](https://rdatatable.gitlab.io/data.table/articles/datatable-joins.html).
+I also contribute to the broader ecosystem, including documentation for the `{data.table}` package regarding high-performance join operations.
 
-## Current Project
+## Featured Project: NYC Taxi Earnings Optimization
 
-I'm currently working on a [data science portfolio project](https://github.com/AngelFelizR/NycTaxi) focused on **increasing NYC taxi drivers' earnings** through data-driven strategies. Using the CRISP-DM methodology, I'm analyzing rideshare data from Juno, Uber, Via and Lyft to determine:
+I am currently developing a [sequential decision support system](https://github.com/AngelFelizR/NycTaxi) designed to maximize NYC taxi drivers' net hourly earnings. Rather than a standard prediction model, this project implements:
 
-- How drivers can increase monthly earnings by selectively skipping trips?
-- How changing initial locations and timing can optimize earnings?
+- **Policy Evaluation**: Testing different driver strategies through high-fidelity simulations.
+- **Lookahead Approximations**: Using future-state simulations to inform current trip acceptance.
+- **Reproducible MLOps**: A fully containerized environment using **Nix + Docker** and automated deployment pipelines.
 
-This project showcases my skills with the R ecosystem, particularly with:
-
-- Tidyverse packages for data manipulation and visualization
-- Geospatial analysis using sf, leaflet, and tmap
-- Statistical modeling and inference
-- Database connectivity and high-performance data manipulation
+The goal is to move from probabilistic predictions to profit-driven thresholds, demonstrating a 51.5% potential uplift in expected earnings through optimized decision policies.
 
 ## Skills & Education
 
-I hold a Bachelor's in Industrial Engineering from Instituto Tecnológico de Santo Domingo and am fluent in both English and Spanish. I'm certified in [data science](https://www.datacamp.com/statement-of-accomplishment/track/b581b997d94da7a5a9cee1f7aac7f9427d09fd87?raw=1), [R programming](https://www.datacamp.com/statement-of-accomplishment/track/ef90c8e3e4906fa1533a788c7d24c556a7633a2c), and [data analysis](https://www.datacamp.com/statement-of-accomplishment/track/5eb368dc700e523f76bfe13a1f228b8772ebb6a5) through DataCamp.
+I hold a **B.S. in Industrial Engineering** from INTEC (GPA 3.91/4.0) and am currently pursuing a **Master of Data Science** (expected 2026). My technical stack is built for scale and precision:
+
+- **Decision Science**: Powell Framework (PFA/DLA), Monte Carlo Simulation, Discrete Event Simulation.
+- **Core Stack**: R ({data.table}, {sf}, {tidymodels}, {pins}) and Python (Polars, Flask, SQLAlchemy).
+- **Engineering & MLOps**: Nix, Docker, DuckDB, GitHub Actions, and spatial data engineering.
 
 :::
+
+<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
