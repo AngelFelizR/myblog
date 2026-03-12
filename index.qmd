@@ -12,10 +12,11 @@ about:
       url: "https://github.com/AngelFelizR"
     - text: CV
       url: "Angel-Feliz_Applied-Scientist.pdf"
+include-in-header:
+  - text: |
+      <script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
 comments: false
 ---
-
-<div class="badge-base LI-profile-badge" data-locale="en_US" data-size="large" data-theme="light" data-type="HORIZONTAL" data-vanity="angel-esteban-feliz-ferreras" data-version="v1"><a class="badge-base__link LI-simple-link" href="https://do.linkedin.com/in/angel-esteban-feliz-ferreras?trk=profile-badge">Angel Esteban Feliz Ferreras</a></div> 
 
 ::: {.column-page}
 
@@ -53,6 +54,16 @@ I hold a **B.S. in Industrial Engineering** from INTEC (GPA 3.91/4.0) and am cur
 - **Core Stack**: R ({data.table}, {sf}, {tidymodels}, {pins}) and Python (Polars, Flask, SQLAlchemy).
 - **Engineering & MLOps**: Nix, Docker, DuckDB, GitHub Actions, and spatial data engineering.
 
+```{=html}
+<div class="badge-base LI-profile-badge" 
+     data-locale="en_US" 
+     data-size="large" 
+     data-theme="light" 
+     data-type="HORIZONTAL" 
+     data-vanity="angel-esteban-feliz-ferreras" 
+     data-version="v1"
+     style="margin-top: 40px; display: flex; justify-content: center;">
+  <a class="badge-base__link LI-simple-link" href="[https://do.linkedin.com/in/angel-esteban-feliz-ferreras?trk=profile-badge](https://do.linkedin.com/in/angel-esteban-feliz-ferreras?trk=profile-badge)"></a>
+</div>
+```
 :::
-
-<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>

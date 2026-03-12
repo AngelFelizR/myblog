@@ -1,35 +1,40 @@
-on:
-  workflow_dispatch:
-  push:
-    branches: main
+name: Render and Deploy Report
 
-name: Quarto Publish
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    container:
+      image: ghcr.io/angelfelizr/personal-blog:4.5.3
+      options: --user root
+
     steps:
-      - name: Check out repository
+      - name: Checkout Code
         uses: actions/checkout@v4
-
-      - name: Set up Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
-
-      - name: Install R
-        uses: r-lib/actions/setup-r@v2
         with:
-          r-version: '4.4.3'
+          # This ensures code is in the standard path the job expects
+          path: personal_blog
 
-      - name: Install R Dependencies
-        uses: r-lib/actions/setup-renv@v2
-        with:
-          cache-version: 1
+      - name: Run Pipeline and Render
+        # We set the working directory to match your manual 'cd' step
+        working-directory: ./personal_blog
+        run: |
+          nix-shell --run "quarto render"
 
-      - name: Render and Publish
-        uses: quarto-dev/quarto-actions/publish@v2
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          target: gh-pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Path relative to the workspace root
+          publish_dir: ./personal_blog/docs
+          publish_branch: gh-pages
+  

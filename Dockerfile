@@ -2,7 +2,7 @@ FROM ubuntu:24.04
 
 # Update and install ALL packages in one layer, including locales
 RUN apt update -y && \
-    apt install -y locales curl openssh-server xz-utils && \
+    apt install -y locales curl openssh-server xz-utils git ca-certificates && \
     locale-gen en_US.UTF-8 && \
     update-locale LANG=en_US.UTF-8
 
@@ -20,6 +20,13 @@ ENV user=root
 
 # Install direnv and nix-direnv for Positron integration
 RUN nix-env -f '<nixpkgs>' -iA direnv nix-direnv
+
+# Set up rstats-on-nix cache
+# Thanks to the rstats-on-nix cache, precompiled binary packages will
+# be downloaded instead of being compiled from source
+RUN mkdir -p /root/.config/nix && \
+    echo "substituters = https://cache.nixos.org https://rstats-on-nix.cachix.org" > /root/.config/nix/nix.conf && \
+    echo "trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= rstats-on-nix.cachix.org-1:vdiiVgocg6WeJrODIqdprZRUrhi1JzhBnXv7aWI6+F0=" >> /root/.config/nix/nix.conf
 
 # Starting nix-shell
 RUN echo '. /nix/var/nix/profiles/default/etc/profile.d/nix.sh' >> /root/.bashrc

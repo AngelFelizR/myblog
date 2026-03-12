@@ -3,10 +3,12 @@ let
  
   rpkgs = builtins.attrValues {
     inherit (pkgs.rPackages) 
+     knitr
      tidymodels
      glmnet
      naniar
-     mice;
+     mice
+     moments;
   };
 
   system_packages = builtins.attrValues {

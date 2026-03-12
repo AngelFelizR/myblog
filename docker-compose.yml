@@ -2,7 +2,7 @@ services:
   personal-blog:
     build:
       context: .
-    image: angelfelizr/personal-blog:4.5.3
+    image: ghcr.io/angelfelizr/personal-blog:4.5.3
     container_name: personal-blog
     ports:
       - "2222:22"
